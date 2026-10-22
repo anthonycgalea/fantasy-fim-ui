@@ -32,3 +32,19 @@ load the application correctly.
 - TypeScript
 - React
 - Tailwind CSS
+
+## League API
+
+The Leagues page reuses the original frontend’s `GET /api/leagues` contract
+and displays entries where `is_fim` is true.
+
+Production requests default to `https://www.fantasyfim.com/api`.
+In development, requests use `/api` on the UI’s origin, and Vite proxies
+these requests to `https://www.fantasyfim.com` (preserving `/api/leagues`). Set
+`API_PROXY_TARGET` to another backend origin when needed.
+
+For a separately hosted API, set `VITE_API_BASE_URL` to its full API base URL
+(including `/api`) before building. That API must allow the UI origin via CORS.
+For same-origin production hosting, set `VITE_API_BASE_URL=/api` and route
+`/api/*` to the backend in your reverse
+proxy; the Vite development proxy does not run in production.
