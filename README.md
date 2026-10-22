@@ -38,9 +38,9 @@ load the application correctly.
 The Leagues page reuses the original frontend’s `GET /api/leagues` contract
 and displays entries where `is_fim` is true.
 
-Production requests default to `https://www.fantasyfim.com/api`.
+Production requests default to `https://fantasyfim.com/api`.
 In development, requests use `/api` on the UI’s origin, and Vite proxies
-these requests to `https://www.fantasyfim.com` (preserving `/api/leagues`). Set
+these requests to `https://fantasyfim.com` (preserving `/api/leagues`). Set
 `API_PROXY_TARGET` to another backend origin when needed.
 
 For a separately hosted API, set `VITE_API_BASE_URL` to its full API base URL

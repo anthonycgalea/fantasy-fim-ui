@@ -11,7 +11,7 @@ export default defineConfig({
     server: {
       proxy: {
         "/api": {
-          target: process.env.API_PROXY_TARGET || "https://www.fantasyfim.com",
+          target: process.env.API_PROXY_TARGET || "https://fantasyfim.com",
           changeOrigin: true,
         },
       },

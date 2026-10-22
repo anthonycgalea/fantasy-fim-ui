@@ -13,7 +13,7 @@ export type League = {
 };
 
 export async function fetchLeagues(signal?: AbortSignal): Promise<League[]> {
-  const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "/api" : "https://www.fantasyfim.com/api")).replace(/\/$/, "");
+  const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "/api" : "https://fantasyfim.com/api")).replace(/\/$/, "");
   const response = await fetch(`${baseUrl}/leagues`, { signal });
   if (!response.ok) {
     throw new Error(`Unable to load leagues (${response.status})`);
