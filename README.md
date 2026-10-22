@@ -12,14 +12,19 @@ Open your project in the [Lovable editor](https://lovable.dev) and keep building
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Prefer working locally? You need Node.js 22.12+ (or 20.19+) and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
-npm i
-npm run dev
+npm install
+npm run dev -- --port 5173
 ```
+
+Run these commands from the repository root, where `package.json` and
+`vite.config.ts` live. Open http://localhost:5173 after Vite reports it is ready.
+This is a TanStack Start app: running a plain Vite server from `src/` will not
+load the application correctly.
 
 ## Built with
 

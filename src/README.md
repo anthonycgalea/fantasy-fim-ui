@@ -1,21 +1,10 @@
-# tanstack_start_ts
+# Application source
 
-To install dependencies:
+Run the app from the repository root (one directory above this folder):
 
-```bash
-bun install
+```sh
+npm install
+npm run dev -- --port 5173
 ```
 
-To run:
-
-```bash
-bun run 
-```
-
-To type check:
-
-```bash
-bun check
-```
-
-This project was created using `bun init` in bun v1.4.3. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Open http://localhost:5173. See the root README for setup details.
