@@ -11,7 +11,7 @@ export function LeagueSelection({ offseason = false }: { offseason?: boolean }) 
 
   return (
     <>
-      <PageHeader kicker={`// ${label}`} title={title}>
+      <PageHeader title={title}>
         {offseason
           ? "Your offseason leagues, drafts and rosters."
           : "Your leagues, drafts and rosters."}

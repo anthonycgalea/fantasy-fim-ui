@@ -12,7 +12,7 @@ export const Route = createFileRoute("/teams")({
   }),
   component: () => (
     <>
-      <PageHeader kicker="// scouting" title="Teams">Every FiM team, ranked by fantasy points.</PageHeader>
+      <PageHeader title="Teams">Every FiM team, ranked by fantasy points.</PageHeader>
       <EmptyPanel label="Team table will load from the API" />
     </>
   ),

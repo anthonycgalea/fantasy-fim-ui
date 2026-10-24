@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -122,6 +123,9 @@ const nav = [
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isDraftPage = useRouterState({
+    select: (state) => state.location.pathname.startsWith("/drafts/"),
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -152,7 +156,9 @@ function RootComponent() {
             </nav>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
+        <main
+          className={`mx-auto w-full min-w-0 flex-1 ${isDraftPage ? "px-4 py-6 sm:px-6" : "max-w-6xl px-6 py-10"}`}
+        >
           <Outlet />
         </main>
         <footer className="border-t py-6 text-center text-xs text-muted-foreground">

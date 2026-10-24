@@ -31,10 +31,7 @@ export function LeagueLayout({ leagueId }: { leagueId: string }) {
   return (
     <>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <PageHeader
-          kicker={league.data.offseason ? "// offseason league" : "// league"}
-          title={league.data.league_name}
-        >
+        <PageHeader title={league.data.league_name}>
           {league.data.year} · {league.data.weekly_starts} weekly starts · Rankings, lineups and
           rosters.
         </PageHeader>

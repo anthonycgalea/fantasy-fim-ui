@@ -26,7 +26,7 @@ export function DraftScores({ draftId }: { draftId: string }) {
   return (
     <>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <PageHeader kicker="// draft scores" title={league.data.league_name}>
+        <PageHeader title={league.data.league_name}>
           {draft.data.event_key} · {league.data.year} · {league.data.weekly_starts} scoring starts
         </PageHeader>
         <Button asChild variant="outline">

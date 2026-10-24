@@ -52,10 +52,7 @@ export function DraftPage({
   return (
     <>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <PageHeader
-          kicker={league.data.offseason ? "// offseason draft" : "// draft"}
-          title={league.data.league_name}
-        >
+        <PageHeader title={league.data.league_name}>
           {league.data.year}
           {draft.data.event_key ? ` · ${draft.data.event_key}` : ""} · {draft.data.rounds} rounds
         </PageHeader>

@@ -12,7 +12,7 @@ export const Route = createFileRoute("/events")({
   }),
   component: () => (
     <>
-      <PageHeader kicker="// schedule" title="Events">District events by week, through States.</PageHeader>
+      <PageHeader title="Events">District events by week, through States.</PageHeader>
       <EmptyPanel label="Event schedule will load from the API" />
     </>
   ),
