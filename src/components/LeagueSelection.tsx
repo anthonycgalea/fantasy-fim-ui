@@ -53,24 +53,16 @@ export function LeagueSelection({ offseason = false }: { offseason?: boolean }) 
           aria-label={offseason ? "Offseason leagues" : "FiM leagues"}
         >
           {visibleLeagues.map((league) => (
-            <li key={league.league_id} className="rounded-2xl border bg-card p-6 shadow-soft">
-              <h2 className="text-lg font-bold">
-                <a
-                  href={`/leagues/${league.league_id}`}
-                  className="hover:text-primary hover:underline"
-                >
-                  {league.league_name}
-                </a>
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {league.year}
-                {league.offseason ? " · Offseason" : ""}
-              </p>
+            <li key={league.league_id}>
               <a
                 href={`/leagues/${league.league_id}`}
-                className="mt-4 inline-block text-sm font-semibold text-primary"
+                className="block h-full rounded-2xl border bg-card p-6 shadow-soft transition hover:border-primary/50 hover:bg-accent/30 focus-visible:outline-2 focus-visible:outline-ring"
               >
-                View league →
+                <h2 className="text-lg font-bold">{league.league_name}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {league.year}
+                  {league.offseason ? " · Offseason" : ""}
+                </p>
               </a>
             </li>
           ))}
