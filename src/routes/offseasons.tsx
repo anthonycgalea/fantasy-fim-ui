@@ -1,15 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LeagueSelection } from "@/components/LeagueSelection";
+import { OffseasonDrafts } from "@/components/OffseasonDrafts";
 
 export const Route = createFileRoute("/offseasons")({
   head: () => ({
     meta: [
       { title: "Offseasons · Fantasy FiM" },
-      { name: "description", content: "Browse Fantasy FIRST in Michigan offseason leagues." },
+      { name: "description", content: "Browse Fantasy FIRST in Michigan offseason drafts." },
       { property: "og:title", content: "Offseasons · Fantasy FiM" },
       {
         property: "og:description",
-        content: "Browse Fantasy FIRST in Michigan offseason leagues.",
+        content: "Browse Fantasy FIRST in Michigan offseason drafts.",
       },
     ],
   }),
@@ -17,5 +17,5 @@ export const Route = createFileRoute("/offseasons")({
 });
 
 export function OffseasonsPage() {
-  return <LeagueSelection offseason />;
+  return <OffseasonDrafts />;
 }

@@ -9,7 +9,6 @@ import {
   useFantasyTeams,
   useLeague,
 } from "@/api/drafts";
-import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { AvailableTeams } from "./AvailableTeams";
 import { DraftBoard } from "./DraftBoard";
@@ -51,11 +50,14 @@ export function DraftPage({
   const epaYear = getEpaYear(league.data, currentWeek.data);
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <PageHeader title={league.data.league_name}>
-          {league.data.year}
-          {draft.data.event_key ? ` · ${draft.data.event_key}` : ""} · {draft.data.rounds} rounds
-        </PageHeader>
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-l-4 border-l-primary bg-card px-4 py-3 shadow-soft sm:px-5">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1">
+          <h1 className="text-xl font-extrabold sm:text-2xl">{league.data.league_name}</h1>
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            {league.data.year}
+            {draft.data.event_key ? ` · ${draft.data.event_key}` : ""} · {draft.data.rounds} rounds
+          </p>
+        </div>
         {league.data.offseason ? (
           <Button asChild>
             <Link to="/drafts/$draftId/scores" params={{ draftId }}>
@@ -69,7 +71,7 @@ export function DraftPage({
             </Link>
           </Button>
         )}
-      </div>
+      </header>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         {!league.data.offseason ? (
           <div
