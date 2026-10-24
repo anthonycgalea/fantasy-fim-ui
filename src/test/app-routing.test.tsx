@@ -10,6 +10,8 @@ describe("App routing", () => {
   it.each([
     "/",
     "/offseasons",
+    "/events",
+    "/eventData",
     "/leagues/2",
     "/leagues/2/rankings",
     "/leagues/2/scores",
