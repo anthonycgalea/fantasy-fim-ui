@@ -14,7 +14,6 @@ const columns = [
   { key: "avgepa", label: "Average EPA", description: "Average team EPA, rounded" },
   { key: "medianepa", label: "Median EPA", description: "Median team EPA" },
 ] as const;
-const numberFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
 export function EventDataPage() {
   const events = useEventData();
@@ -184,11 +183,7 @@ export function EventDataPage() {
                                     }
                               }
                             >
-                              {value === null
-                                ? "—"
-                                : key === "avgepa"
-                                  ? Math.round(value)
-                                  : numberFormat.format(value)}
+                              {value === null ? "—" : Math.round(value)}
                             </div>
                           </td>
                         );

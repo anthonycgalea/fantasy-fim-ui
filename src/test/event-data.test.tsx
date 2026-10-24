@@ -120,7 +120,7 @@ describe("Event data", () => {
       within(troy)
         .getAllByRole("cell")
         .map((cell) => cell.textContent),
-    ).toEqual(["12", "2,151", "1,657", "—", "1704", "1,695.5"]);
+    ).toEqual(["12", "2151", "1657", "—", "1704", "1696"]);
     fireEvent.click(screen.getByRole("button", { name: "Average EPA" }));
     expect(
       within(table)
