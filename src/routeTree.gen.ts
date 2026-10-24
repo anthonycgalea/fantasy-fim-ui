@@ -14,6 +14,17 @@ import { Route as EventsRouteImport } from './routes/events'
 import { Route as LeaguesRouteImport } from './routes/leagues'
 import { Route as OffseasonsRouteImport } from './routes/offseasons'
 import { Route as TeamsRouteImport } from './routes/teams'
+import { Route as DraftsDraftIdRouteImport } from './routes/drafts.$draftId'
+import { Route as LeaguesLeagueIdRouteImport } from './routes/leagues_.$leagueId'
+import { Route as DraftsDraftIdLeagueWeeksRouteImport } from './routes/drafts_.$draftId.leagueWeeks'
+import { Route as DraftsDraftIdScoresRouteImport } from './routes/drafts_.$draftId.scores'
+import { Route as LeaguesLeagueIdIndexRouteImport } from './routes/leagues_.$leagueId.index'
+import { Route as LeaguesLeagueIdAvailableRouteImport } from './routes/leagues_.$leagueId.available'
+import { Route as LeaguesLeagueIdDraftsRouteImport } from './routes/leagues_.$leagueId.drafts'
+import { Route as LeaguesLeagueIdRankingsRouteImport } from './routes/leagues_.$leagueId.rankings'
+import { Route as LeaguesLeagueIdRostersRouteImport } from './routes/leagues_.$leagueId.rosters'
+import { Route as LeaguesLeagueIdScoresRouteImport } from './routes/leagues_.$leagueId.scores'
+import { Route as LeaguesLeagueIdWaiversRouteImport } from './routes/leagues_.$leagueId.waivers'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +51,63 @@ const TeamsRoute = TeamsRouteImport.update({
   path: '/teams',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DraftsDraftIdRoute = DraftsDraftIdRouteImport.update({
+  id: '/drafts/$draftId',
+  path: '/drafts/$draftId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaguesLeagueIdRoute = LeaguesLeagueIdRouteImport.update({
+  id: '/leagues_/$leagueId',
+  path: '/leagues/$leagueId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DraftsDraftIdLeagueWeeksRoute =
+  DraftsDraftIdLeagueWeeksRouteImport.update({
+    id: '/drafts_/$draftId/leagueWeeks',
+    path: '/drafts/$draftId/leagueWeeks',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DraftsDraftIdScoresRoute = DraftsDraftIdScoresRouteImport.update({
+  id: '/drafts_/$draftId/scores',
+  path: '/drafts/$draftId/scores',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaguesLeagueIdIndexRoute = LeaguesLeagueIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LeaguesLeagueIdRoute,
+} as any)
+const LeaguesLeagueIdAvailableRoute =
+  LeaguesLeagueIdAvailableRouteImport.update({
+    id: '/available',
+    path: '/available',
+    getParentRoute: () => LeaguesLeagueIdRoute,
+  } as any)
+const LeaguesLeagueIdDraftsRoute = LeaguesLeagueIdDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => LeaguesLeagueIdRoute,
+} as any)
+const LeaguesLeagueIdRankingsRoute = LeaguesLeagueIdRankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => LeaguesLeagueIdRoute,
+} as any)
+const LeaguesLeagueIdRostersRoute = LeaguesLeagueIdRostersRouteImport.update({
+  id: '/rosters',
+  path: '/rosters',
+  getParentRoute: () => LeaguesLeagueIdRoute,
+} as any)
+const LeaguesLeagueIdScoresRoute = LeaguesLeagueIdScoresRouteImport.update({
+  id: '/scores',
+  path: '/scores',
+  getParentRoute: () => LeaguesLeagueIdRoute,
+} as any)
+const LeaguesLeagueIdWaiversRoute = LeaguesLeagueIdWaiversRouteImport.update({
+  id: '/waivers',
+  path: '/waivers',
+  getParentRoute: () => LeaguesLeagueIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +115,17 @@ export interface FileRoutesByFullPath {
   '/leagues': typeof LeaguesRoute
   '/offseasons': typeof OffseasonsRoute
   '/teams': typeof TeamsRoute
+  '/drafts/$draftId': typeof DraftsDraftIdRoute
+  '/leagues/$leagueId': typeof LeaguesLeagueIdRouteWithChildren
+  '/drafts/$draftId/leagueWeeks': typeof DraftsDraftIdLeagueWeeksRoute
+  '/drafts/$draftId/scores': typeof DraftsDraftIdScoresRoute
+  '/leagues/$leagueId/available': typeof LeaguesLeagueIdAvailableRoute
+  '/leagues/$leagueId/drafts': typeof LeaguesLeagueIdDraftsRoute
+  '/leagues/$leagueId/rankings': typeof LeaguesLeagueIdRankingsRoute
+  '/leagues/$leagueId/rosters': typeof LeaguesLeagueIdRostersRoute
+  '/leagues/$leagueId/scores': typeof LeaguesLeagueIdScoresRoute
+  '/leagues/$leagueId/waivers': typeof LeaguesLeagueIdWaiversRoute
+  '/leagues/$leagueId/': typeof LeaguesLeagueIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +133,16 @@ export interface FileRoutesByTo {
   '/leagues': typeof LeaguesRoute
   '/offseasons': typeof OffseasonsRoute
   '/teams': typeof TeamsRoute
+  '/drafts/$draftId': typeof DraftsDraftIdRoute
+  '/drafts/$draftId/leagueWeeks': typeof DraftsDraftIdLeagueWeeksRoute
+  '/drafts/$draftId/scores': typeof DraftsDraftIdScoresRoute
+  '/leagues/$leagueId/available': typeof LeaguesLeagueIdAvailableRoute
+  '/leagues/$leagueId/drafts': typeof LeaguesLeagueIdDraftsRoute
+  '/leagues/$leagueId/rankings': typeof LeaguesLeagueIdRankingsRoute
+  '/leagues/$leagueId/rosters': typeof LeaguesLeagueIdRostersRoute
+  '/leagues/$leagueId/scores': typeof LeaguesLeagueIdScoresRoute
+  '/leagues/$leagueId/waivers': typeof LeaguesLeagueIdWaiversRoute
+  '/leagues/$leagueId': typeof LeaguesLeagueIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +151,72 @@ export interface FileRoutesById {
   '/leagues': typeof LeaguesRoute
   '/offseasons': typeof OffseasonsRoute
   '/teams': typeof TeamsRoute
+  '/drafts/$draftId': typeof DraftsDraftIdRoute
+  '/leagues_/$leagueId': typeof LeaguesLeagueIdRouteWithChildren
+  '/drafts_/$draftId/leagueWeeks': typeof DraftsDraftIdLeagueWeeksRoute
+  '/drafts_/$draftId/scores': typeof DraftsDraftIdScoresRoute
+  '/leagues_/$leagueId/available': typeof LeaguesLeagueIdAvailableRoute
+  '/leagues_/$leagueId/drafts': typeof LeaguesLeagueIdDraftsRoute
+  '/leagues_/$leagueId/rankings': typeof LeaguesLeagueIdRankingsRoute
+  '/leagues_/$leagueId/rosters': typeof LeaguesLeagueIdRostersRoute
+  '/leagues_/$leagueId/scores': typeof LeaguesLeagueIdScoresRoute
+  '/leagues_/$leagueId/waivers': typeof LeaguesLeagueIdWaiversRoute
+  '/leagues_/$leagueId/': typeof LeaguesLeagueIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/events' | '/leagues' | '/offseasons' | '/teams'
+  fullPaths:
+    | '/'
+    | '/events'
+    | '/leagues'
+    | '/offseasons'
+    | '/teams'
+    | '/drafts/$draftId'
+    | '/leagues/$leagueId'
+    | '/drafts/$draftId/leagueWeeks'
+    | '/drafts/$draftId/scores'
+    | '/leagues/$leagueId/available'
+    | '/leagues/$leagueId/drafts'
+    | '/leagues/$leagueId/rankings'
+    | '/leagues/$leagueId/rosters'
+    | '/leagues/$leagueId/scores'
+    | '/leagues/$leagueId/waivers'
+    | '/leagues/$leagueId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/events' | '/leagues' | '/offseasons' | '/teams'
-  id: '__root__' | '/' | '/events' | '/leagues' | '/offseasons' | '/teams'
+  to:
+    | '/'
+    | '/events'
+    | '/leagues'
+    | '/offseasons'
+    | '/teams'
+    | '/drafts/$draftId'
+    | '/drafts/$draftId/leagueWeeks'
+    | '/drafts/$draftId/scores'
+    | '/leagues/$leagueId/available'
+    | '/leagues/$leagueId/drafts'
+    | '/leagues/$leagueId/rankings'
+    | '/leagues/$leagueId/rosters'
+    | '/leagues/$leagueId/scores'
+    | '/leagues/$leagueId/waivers'
+    | '/leagues/$leagueId'
+  id:
+    | '__root__'
+    | '/'
+    | '/events'
+    | '/leagues'
+    | '/offseasons'
+    | '/teams'
+    | '/drafts/$draftId'
+    | '/leagues_/$leagueId'
+    | '/drafts_/$draftId/leagueWeeks'
+    | '/drafts_/$draftId/scores'
+    | '/leagues_/$leagueId/available'
+    | '/leagues_/$leagueId/drafts'
+    | '/leagues_/$leagueId/rankings'
+    | '/leagues_/$leagueId/rosters'
+    | '/leagues_/$leagueId/scores'
+    | '/leagues_/$leagueId/waivers'
+    | '/leagues_/$leagueId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +225,10 @@ export interface RootRouteChildren {
   LeaguesRoute: typeof LeaguesRoute
   OffseasonsRoute: typeof OffseasonsRoute
   TeamsRoute: typeof TeamsRoute
+  DraftsDraftIdRoute: typeof DraftsDraftIdRoute
+  LeaguesLeagueIdRoute: typeof LeaguesLeagueIdRouteWithChildren
+  DraftsDraftIdLeagueWeeksRoute: typeof DraftsDraftIdLeagueWeeksRoute
+  DraftsDraftIdScoresRoute: typeof DraftsDraftIdScoresRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,8 +268,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/drafts/$draftId': {
+      id: '/drafts/$draftId'
+      path: '/drafts/$draftId'
+      fullPath: '/drafts/$draftId'
+      preLoaderRoute: typeof DraftsDraftIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leagues_/$leagueId': {
+      id: '/leagues_/$leagueId'
+      path: '/leagues/$leagueId'
+      fullPath: '/leagues/$leagueId'
+      preLoaderRoute: typeof LeaguesLeagueIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drafts_/$draftId/leagueWeeks': {
+      id: '/drafts_/$draftId/leagueWeeks'
+      path: '/drafts/$draftId/leagueWeeks'
+      fullPath: '/drafts/$draftId/leagueWeeks'
+      preLoaderRoute: typeof DraftsDraftIdLeagueWeeksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drafts_/$draftId/scores': {
+      id: '/drafts_/$draftId/scores'
+      path: '/drafts/$draftId/scores'
+      fullPath: '/drafts/$draftId/scores'
+      preLoaderRoute: typeof DraftsDraftIdScoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leagues_/$leagueId/': {
+      id: '/leagues_/$leagueId/'
+      path: '/'
+      fullPath: '/leagues/$leagueId/'
+      preLoaderRoute: typeof LeaguesLeagueIdIndexRouteImport
+      parentRoute: typeof LeaguesLeagueIdRoute
+    }
+    '/leagues_/$leagueId/available': {
+      id: '/leagues_/$leagueId/available'
+      path: '/available'
+      fullPath: '/leagues/$leagueId/available'
+      preLoaderRoute: typeof LeaguesLeagueIdAvailableRouteImport
+      parentRoute: typeof LeaguesLeagueIdRoute
+    }
+    '/leagues_/$leagueId/drafts': {
+      id: '/leagues_/$leagueId/drafts'
+      path: '/drafts'
+      fullPath: '/leagues/$leagueId/drafts'
+      preLoaderRoute: typeof LeaguesLeagueIdDraftsRouteImport
+      parentRoute: typeof LeaguesLeagueIdRoute
+    }
+    '/leagues_/$leagueId/rankings': {
+      id: '/leagues_/$leagueId/rankings'
+      path: '/rankings'
+      fullPath: '/leagues/$leagueId/rankings'
+      preLoaderRoute: typeof LeaguesLeagueIdRankingsRouteImport
+      parentRoute: typeof LeaguesLeagueIdRoute
+    }
+    '/leagues_/$leagueId/rosters': {
+      id: '/leagues_/$leagueId/rosters'
+      path: '/rosters'
+      fullPath: '/leagues/$leagueId/rosters'
+      preLoaderRoute: typeof LeaguesLeagueIdRostersRouteImport
+      parentRoute: typeof LeaguesLeagueIdRoute
+    }
+    '/leagues_/$leagueId/scores': {
+      id: '/leagues_/$leagueId/scores'
+      path: '/scores'
+      fullPath: '/leagues/$leagueId/scores'
+      preLoaderRoute: typeof LeaguesLeagueIdScoresRouteImport
+      parentRoute: typeof LeaguesLeagueIdRoute
+    }
+    '/leagues_/$leagueId/waivers': {
+      id: '/leagues_/$leagueId/waivers'
+      path: '/waivers'
+      fullPath: '/leagues/$leagueId/waivers'
+      preLoaderRoute: typeof LeaguesLeagueIdWaiversRouteImport
+      parentRoute: typeof LeaguesLeagueIdRoute
+    }
   }
 }
+
+interface LeaguesLeagueIdRouteChildren {
+  LeaguesLeagueIdAvailableRoute: typeof LeaguesLeagueIdAvailableRoute
+  LeaguesLeagueIdDraftsRoute: typeof LeaguesLeagueIdDraftsRoute
+  LeaguesLeagueIdRankingsRoute: typeof LeaguesLeagueIdRankingsRoute
+  LeaguesLeagueIdRostersRoute: typeof LeaguesLeagueIdRostersRoute
+  LeaguesLeagueIdScoresRoute: typeof LeaguesLeagueIdScoresRoute
+  LeaguesLeagueIdWaiversRoute: typeof LeaguesLeagueIdWaiversRoute
+  LeaguesLeagueIdIndexRoute: typeof LeaguesLeagueIdIndexRoute
+}
+
+const LeaguesLeagueIdRouteChildren: LeaguesLeagueIdRouteChildren = {
+  LeaguesLeagueIdAvailableRoute: LeaguesLeagueIdAvailableRoute,
+  LeaguesLeagueIdDraftsRoute: LeaguesLeagueIdDraftsRoute,
+  LeaguesLeagueIdRankingsRoute: LeaguesLeagueIdRankingsRoute,
+  LeaguesLeagueIdRostersRoute: LeaguesLeagueIdRostersRoute,
+  LeaguesLeagueIdScoresRoute: LeaguesLeagueIdScoresRoute,
+  LeaguesLeagueIdWaiversRoute: LeaguesLeagueIdWaiversRoute,
+  LeaguesLeagueIdIndexRoute: LeaguesLeagueIdIndexRoute,
+}
+
+const LeaguesLeagueIdRouteWithChildren = LeaguesLeagueIdRoute._addFileChildren(
+  LeaguesLeagueIdRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -125,6 +378,10 @@ const rootRouteChildren: RootRouteChildren = {
   LeaguesRoute: LeaguesRoute,
   OffseasonsRoute: OffseasonsRoute,
   TeamsRoute: TeamsRoute,
+  DraftsDraftIdRoute: DraftsDraftIdRoute,
+  LeaguesLeagueIdRoute: LeaguesLeagueIdRouteWithChildren,
+  DraftsDraftIdLeagueWeeksRoute: DraftsDraftIdLeagueWeeksRoute,
+  DraftsDraftIdScoresRoute: DraftsDraftIdScoresRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
