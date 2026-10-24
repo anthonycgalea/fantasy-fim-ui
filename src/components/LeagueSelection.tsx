@@ -3,9 +3,8 @@ import { useLeagues } from "@/api/useLeagues";
 import { EmptyPanel } from "@/components/PageHeader";
 
 export function LeagueSelection({ offseason = false }: { offseason?: boolean }) {
-  const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
-  const years = Array.from({ length: 10 }, (_, index) => currentYear - index);
+  const [year, setYear] = useState(2026);
+  const years = [2026, 2025];
   const leagues = useLeagues(offseason ? undefined : year);
   const title = offseason ? "Offseasons" : "Leagues";
   const label = offseason ? "offseasons" : "leagues";

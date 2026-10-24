@@ -79,6 +79,10 @@ describe("API leagues", () => {
     renderPage();
     const select = screen.getByRole("combobox", { name: "League year" });
     expect(select).toHaveValue("2026");
+    expect(Array.from(select.querySelectorAll("option"), (option) => option.value)).toEqual([
+      "2026",
+      "2025",
+    ]);
     expect(await screen.findByText("2026 Michigan League")).toBeInTheDocument();
     fireEvent.change(select, { target: { value: "2025" } });
     expect(await screen.findByText("2025 Michigan League")).toBeInTheDocument();
