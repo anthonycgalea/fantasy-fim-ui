@@ -184,8 +184,8 @@ describe("Draft flow", () => {
         .map((cell) => cell.textContent),
     ).toEqual([
       "Team Number",
-      "Team Name",
       "",
+      "Team Name",
       "2025 XP",
       "Week 1",
       "Week 2",
@@ -198,7 +198,7 @@ describe("Draft flow", () => {
       within(table)
         .getAllByRole("row")
         .slice(1)
-        .map((row) => row.querySelector("td")?.textContent),
+        .map((row) => row.querySelectorAll("td")[1]?.textContent),
     ).toEqual(["High EPA", "Low EPA", "Missing EPA"]);
     const highRow = within(table).getByText("High EPA").closest("tr")!;
     expect(within(highRow).getAllByRole("cell")[2]).toHaveTextContent("70");

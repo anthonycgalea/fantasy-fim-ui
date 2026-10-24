@@ -38,10 +38,10 @@ export function AvailableTeamsTable({
             <th scope="col" className="px-4 py-4">
               Team Number
             </th>
+            <th scope="col" aria-label="Team icon" className="w-16 px-4 py-4" />
             <th scope="col" className="px-4 py-4">
               Team Name
             </th>
-            <th scope="col" aria-label="Team icon" className="w-16 px-4 py-4" />
             <th scope="col" className="whitespace-nowrap px-4 py-4 text-right">
               {leagueYear - 1} XP
             </th>
@@ -65,10 +65,10 @@ export function AvailableTeamsTable({
                   {team.team_number}
                 </a>
               </th>
-              <td className="min-w-48 px-4 py-3 font-semibold">{team.name}</td>
               <td className="px-4 py-3">
                 <TeamIcon number={team.team_number} year={leagueYear} />
               </td>
+              <td className="min-w-48 px-4 py-3 font-semibold">{team.name}</td>
               <td className="px-4 py-3 text-right font-semibold tabular-nums">
                 {team.year_end_epa ?? "N/A"}
               </td>
