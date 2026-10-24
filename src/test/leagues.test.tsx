@@ -153,7 +153,7 @@ describe("Offseason leagues", () => {
       return {
         ok: true,
         json: async () =>
-          url === "/api/leagues"
+          url === "/api/leagues?year=2026"
             ? leagues
             : [
                 { draft_id: id * 10 + 1, league_id: id, event_key: `2026second${id}`, rounds: 3 },
@@ -181,6 +181,44 @@ describe("Offseason leagues", () => {
     expect(leagues.map((league) => league.league_id)).toEqual([9, 100, 42, 20]);
   });
 
+  it("offers 2026 and 2025 and refetches offseason links for the selected year", async () => {
+    const fetch = vi.fn(async (url: string) => ({
+      ok: true,
+      json: async () =>
+        url.startsWith("/api/leagues?year=")
+          ? [
+              {
+                league_id: url.endsWith("2025") ? 25 : 26,
+                league_name: url.endsWith("2025") ? "2025 Offseason" : "2026 Offseason",
+                is_fim: false,
+                offseason: true,
+                year: url.endsWith("2025") ? 2025 : 2026,
+              },
+            ]
+          : [{ draft_id: url.includes("/25/") ? 250 : 260, event_key: "event", rounds: 2 }],
+    }));
+    vi.stubGlobal("fetch", fetch);
+    renderPage(true);
+    const select = screen.getByRole("combobox", { name: "Offseason year" });
+    expect(select).toHaveValue("2026");
+    expect(Array.from(select.querySelectorAll("option"), (option) => option.value)).toEqual([
+      "2026",
+      "2025",
+    ]);
+    expect(await screen.findByRole("link", { name: /2026 Offseason/ })).toHaveAttribute(
+      "href",
+      "/drafts/260",
+    );
+    fireEvent.change(select, { target: { value: "2025" } });
+    expect(await screen.findByRole("link", { name: /2025 Offseason/ })).toHaveAttribute(
+      "href",
+      "/drafts/250",
+    );
+    expect(screen.queryByRole("link", { name: /2026 Offseason/ })).not.toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledWith("/api/leagues?year=2025", expect.anything());
+    expect(fetch).toHaveBeenCalledWith("/api/leagues/25/drafts", expect.anything());
+  });
+
   it("only looks up links when their cards approach the viewport", async () => {
     const intersections = new Map<Element, (visible: boolean) => void>();
     vi.stubGlobal(
@@ -196,7 +234,7 @@ describe("Offseason leagues", () => {
     const fetch = vi.fn(async (url: string) => ({
       ok: true,
       json: async () =>
-        url === "/api/leagues"
+        url === "/api/leagues?year=2026"
           ? [
               {
                 league_id: 2,
@@ -244,7 +282,7 @@ describe("Offseason leagues", () => {
       vi.fn(async (url: string) => ({
         ok: true,
         json: async () =>
-          url === "/api/leagues"
+          url === "/api/leagues?year=2026"
             ? [
                 {
                   league_id: 1,
@@ -280,7 +318,7 @@ describe("Offseason leagues", () => {
       vi.fn(async (url: string) => ({
         ok: true,
         json: async () =>
-          url === "/api/leagues"
+          url === "/api/leagues?year=2026"
             ? [
                 {
                   league_id: 1,
@@ -309,7 +347,7 @@ describe("Offseason leagues", () => {
         return {
           ok: true,
           json: async () =>
-            url === "/api/leagues"
+            url === "/api/leagues?year=2026"
               ? [
                   {
                     league_id: 1,

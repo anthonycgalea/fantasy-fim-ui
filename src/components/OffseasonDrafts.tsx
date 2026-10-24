@@ -3,7 +3,8 @@ import { useQueries, type UseQueryResult } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { fetchApi, type Draft } from "@/api/drafts";
 import { useLeagues, type League } from "@/api/useLeagues";
-import { EmptyPanel, PageHeader } from "@/components/PageHeader";
+import { YearSelector } from "@/components/YearSelector";
+import { EmptyPanel } from "@/components/PageHeader";
 import { ErrorPanel, LoadingPanel } from "@/components/drafts/QueryPanel";
 
 function OffseasonCard({
@@ -81,7 +82,8 @@ function OffseasonCard({
 }
 
 export function OffseasonDrafts() {
-  const leagues = useLeagues();
+  const [year, setYear] = useState(2026);
+  const leagues = useLeagues(year);
   const [visibleIds, setVisibleIds] = useState(() => new Set<number>());
   const onVisible = useCallback((id: number) => {
     setVisibleIds((previous) => (previous.has(id) ? previous : new Set([...previous, id])));
@@ -99,9 +101,15 @@ export function OffseasonDrafts() {
   });
   return (
     <>
-      <PageHeader title="Offseasons">
-        Choose an offseason to view its latest draft and scores.
-      </PageHeader>
+      <div className="mb-8">
+        <div className="flex flex-wrap items-center gap-3">
+          <YearSelector label="Offseason year" year={year} onChange={setYear} />
+          <h1 className="text-4xl font-extrabold">Offseasons</h1>
+        </div>
+        <p className="mt-2 max-w-2xl text-muted-foreground">
+          Choose an offseason to view its latest draft and scores.
+        </p>
+      </div>
       {leagues.isPending ? (
         <LoadingPanel label="Loading offseasons…" />
       ) : leagues.isError ? (

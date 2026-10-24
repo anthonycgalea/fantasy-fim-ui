@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useLeagues } from "@/api/useLeagues";
+import { YearSelector } from "@/components/YearSelector";
 import { EmptyPanel } from "@/components/PageHeader";
 
 export function LeagueSelection({ offseason = false }: { offseason?: boolean }) {
   const [year, setYear] = useState(2026);
-  const years = [2026, 2025];
   const leagues = useLeagues(offseason ? undefined : year);
   const title = offseason ? "Offseasons" : "Leagues";
   const label = offseason ? "offseasons" : "leagues";
@@ -16,20 +16,7 @@ export function LeagueSelection({ offseason = false }: { offseason?: boolean }) 
     <>
       <div className="mb-8">
         <div className="flex flex-wrap items-center gap-3">
-          {!offseason && (
-            <select
-              aria-label="League year"
-              value={year}
-              onChange={(event) => setYear(Number(event.target.value))}
-              className="rounded-xl border bg-card px-3 py-2 text-2xl font-extrabold text-foreground outline-none focus:ring-2 focus:ring-ring sm:text-3xl"
-            >
-              {years.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          )}
+          {!offseason && <YearSelector label="League year" year={year} onChange={setYear} />}
           <h1 className="text-4xl font-extrabold">{title}</h1>
         </div>
         <p className="mt-2 max-w-2xl text-muted-foreground">
