@@ -149,6 +149,20 @@ function RootComponent() {
                   {n.label}
                 </Link>
               ))}
+              <a
+                href="https://fantasyfim.com/api/apidocs"
+                className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+              >
+                API
+              </a>
+              <a
+                href="https://github.com/anthonycgalea/fantasy-fim"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+              >
+                GitHub
+              </a>
               <ThemeToggle />
               <button className="ml-3 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
                 Sign in

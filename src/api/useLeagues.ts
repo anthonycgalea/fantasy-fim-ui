@@ -12,12 +12,13 @@ export type League = {
   team_size_limit: number;
 };
 
-export async function fetchLeagues(signal?: AbortSignal): Promise<League[]> {
+export async function fetchLeagues(signal?: AbortSignal, year?: number): Promise<League[]> {
   const baseUrl = (
     import.meta.env["VITE_API_BASE_URL"] ??
     (import.meta.env.DEV ? "/api" : "https://fantasyfim.com/api")
   ).replace(/\/$/, "");
-  const response = await fetch(`${baseUrl}/leagues`, { signal: signal ?? null });
+  const query = year === undefined ? "" : `?year=${year}`;
+  const response = await fetch(`${baseUrl}/leagues${query}`, { signal: signal ?? null });
   if (!response.ok) {
     throw new Error(`Unable to load leagues (${response.status})`);
   }
@@ -37,8 +38,8 @@ export async function fetchLeagues(signal?: AbortSignal): Promise<League[]> {
   return leagues as League[];
 }
 
-export const useLeagues = () =>
+export const useLeagues = (year?: number) =>
   useQuery({
-    queryKey: ["leagues"],
-    queryFn: ({ signal }) => fetchLeagues(signal),
+    queryKey: year === undefined ? ["leagues"] : ["leagues", year],
+    queryFn: ({ signal }) => fetchLeagues(signal, year),
   });

@@ -58,9 +58,38 @@ describe("API leagues", () => {
       screen.getAllByRole("listitem").map((item) => item.querySelector("h2")?.textContent),
     ).toEqual(["New Michigan League", "Michigan League"]);
     expect(fetch).toHaveBeenCalledWith(
-      "/api/leagues",
+      "/api/leagues?year=2026",
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
+  });
+
+  it("defaults to the current year and refetches leagues when the year changes", async () => {
+    const fetch = vi.fn(async (url: string) => ({
+      ok: true,
+      json: async () => [
+        {
+          league_id: url.endsWith("2025") ? 25 : 26,
+          league_name: url.endsWith("2025") ? "2025 Michigan League" : "2026 Michigan League",
+          is_fim: true,
+          year: url.endsWith("2025") ? 2025 : 2026,
+        },
+      ],
+    }));
+    vi.stubGlobal("fetch", fetch);
+    renderPage();
+    const select = screen.getByRole("combobox", { name: "League year" });
+    expect(select).toHaveValue("2026");
+    expect(await screen.findByText("2026 Michigan League")).toBeInTheDocument();
+    fireEvent.change(select, { target: { value: "2025" } });
+    expect(await screen.findByText("2025 Michigan League")).toBeInTheDocument();
+    expect(screen.queryByText("2026 Michigan League")).not.toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/leagues?year=2025",
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+    fireEvent.change(select, { target: { value: "2026" } });
+    expect(await screen.findByText("2026 Michigan League")).toBeInTheDocument();
+    expect(select).toHaveValue("2026");
   });
 
   it("shows an empty state for no FiM leagues", async () => {

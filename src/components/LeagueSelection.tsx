@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { useLeagues } from "@/api/useLeagues";
-import { PageHeader, EmptyPanel } from "@/components/PageHeader";
+import { EmptyPanel } from "@/components/PageHeader";
 
 export function LeagueSelection({ offseason = false }: { offseason?: boolean }) {
-  const leagues = useLeagues();
+  const currentYear = new Date().getFullYear();
+  const [year, setYear] = useState(currentYear);
+  const years = Array.from({ length: 10 }, (_, index) => currentYear - index);
+  const leagues = useLeagues(offseason ? undefined : year);
   const title = offseason ? "Offseasons" : "Leagues";
   const label = offseason ? "offseasons" : "leagues";
   const visibleLeagues = (
@@ -11,11 +15,30 @@ export function LeagueSelection({ offseason = false }: { offseason?: boolean }) 
 
   return (
     <>
-      <PageHeader title={title}>
-        {offseason
-          ? "Your offseason leagues, drafts and rosters."
-          : "Your leagues, drafts and rosters."}
-      </PageHeader>
+      <div className="mb-8">
+        <div className="flex flex-wrap items-center gap-3">
+          {!offseason && (
+            <select
+              aria-label="League year"
+              value={year}
+              onChange={(event) => setYear(Number(event.target.value))}
+              className="rounded-xl border bg-card px-3 py-2 text-2xl font-extrabold text-foreground outline-none focus:ring-2 focus:ring-ring sm:text-3xl"
+            >
+              {years.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          )}
+          <h1 className="text-4xl font-extrabold">{title}</h1>
+        </div>
+        <p className="mt-2 max-w-2xl text-muted-foreground">
+          {offseason
+            ? "Your offseason leagues, drafts and rosters."
+            : "Your leagues, drafts and rosters."}
+        </p>
+      </div>
       {leagues.isPending ? (
         <div role="status">
           <EmptyPanel label={`Loading ${label}…`} />
