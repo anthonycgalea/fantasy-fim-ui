@@ -10,11 +10,13 @@ export function AvailableTeams({
   isFim,
   epaYear,
   interval,
+  offseason = false,
 }: {
   draftId: string;
   isFim: boolean;
   epaYear: number;
   interval: number | false;
+  offseason?: boolean;
 }) {
   const available = useAvailableTeams(draftId, interval);
   const [selectedWeeks, setSelectedWeeks] = useState(weeks);
@@ -103,6 +105,7 @@ export function AvailableTeams({
               events={team.events}
               epa={team.year_end_epa}
               year={epaYear}
+              hideEmptyWeeks={offseason}
             />
           ))}
         </div>

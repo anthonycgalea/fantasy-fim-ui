@@ -78,14 +78,16 @@ function mockApi(offseason = false, overrides: Record<string, unknown> = {}) {
   const data: Record<string, unknown> = {
     "/api/drafts/7": { draft_id: 7, league_id: 2, event_key: "2026test", rounds: 2 },
     "/api/leagues/2": { ...league, offseason, is_fim: !offseason },
-    "/api/drafts/7/picks": picks,
+    "/api/drafts/7/picks": offseason ? picks.map((pick) => ({ ...pick, events: [] })) : picks,
     "/api/drafts/7/draftOrder": [...order].reverse(),
     "/api/leagues/2/fantasyTeams": [
       { fantasy_team_id: 10, team_name: "Alpha" },
       { fantasy_team_id: 20, team_name: "Bravo" },
     ],
     "/api/currentWeek": { year: 2026, week: 2 },
-    "/api/drafts/7/availableTeams": available,
+    "/api/drafts/7/availableTeams": offseason
+      ? available.map((team) => ({ ...team, events: [] }))
+      : available,
     "/api/drafts/7/fantasyScores": [
       {
         fantasy_team_id: 10,
@@ -151,7 +153,7 @@ describe("Draft flow", () => {
     expect(cells[3]).not.toHaveTextContent("99");
     await waitFor(() => expect(cells[0]).toHaveTextContent("EPA 90"));
     expect(fetch).toHaveBeenCalledWith("/api/epa?teams=27,33&year=2026", expect.anything());
-    expect(within(board).getByRole("link", { name: /Pick 1/ })).toHaveAttribute(
+    expect(within(board).getByText("27").closest("a")).toHaveAttribute(
       "href",
       "https://www.thebluealliance.com/team/27/2026",
     );
@@ -210,6 +212,7 @@ describe("Draft flow", () => {
     expect(await screen.findByRole("heading", { name: "Draft board" })).toBeInTheDocument();
     expect(await screen.findByText("High EPA")).toBeInTheDocument();
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    expect(screen.queryAllByText("No scheduled weeks")).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "League Weeks" })).not.toBeInTheDocument();
   });
 

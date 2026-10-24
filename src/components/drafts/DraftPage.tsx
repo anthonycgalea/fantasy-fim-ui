@@ -148,6 +148,7 @@ export function DraftPage({
           rounds={draft.data.rounds}
           year={league.data.year}
           epaYear={epaYear}
+          offseason={league.data.offseason ?? false}
         />
       ) : (
         <LeagueWeeks
@@ -161,6 +162,7 @@ export function DraftPage({
           draftId={draftId}
           isFim={league.data.is_fim}
           epaYear={epaYear}
+          offseason={league.data.offseason ?? false}
           interval={interval}
         />
       )}

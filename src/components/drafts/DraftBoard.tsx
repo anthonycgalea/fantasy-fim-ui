@@ -11,6 +11,7 @@ export function DraftBoard({
   rounds,
   year,
   epaYear,
+  offseason = false,
 }: {
   order: DraftSlot[];
   picks: DraftPick[];
@@ -18,6 +19,7 @@ export function DraftBoard({
   rounds: number;
   year: number;
   epaYear: number;
+  offseason?: boolean;
 }) {
   const sortedOrder = [...order].sort((a, b) => a.draft_slot - b.draft_slot);
   const pickedNumbers = [
@@ -95,13 +97,16 @@ export function DraftBoard({
                         events={pick.events ?? []}
                         epa={epa.data?.[pick.team_picked]}
                         year={year}
-                        caption={`Pick ${pickNumber}`}
+                        pickNumber={pickNumber}
+                        hideEmptyWeeks={offseason}
                       />
                     ) : (
                       <div
-                        className={`flex min-h-36 flex-col justify-between rounded-xl border border-dashed p-4 ${pickNumber === nextPick ? "border-primary bg-accent/40" : "bg-muted/30"}`}
+                        className={`relative flex min-h-36 flex-col justify-end rounded-xl border border-dashed p-4 ${pickNumber === nextPick ? "border-primary bg-accent/40" : "bg-muted/30"}`}
                       >
-                        <span className="text-xs text-muted-foreground">Pick {pickNumber}</span>
+                        <span className="absolute right-3 top-3 text-xs font-semibold text-muted-foreground">
+                          {pickNumber}
+                        </span>
                         <span className="text-sm font-semibold text-muted-foreground">
                           {pick
                             ? "Skipped"
