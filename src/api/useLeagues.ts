@@ -13,22 +13,32 @@ export type League = {
 };
 
 export async function fetchLeagues(signal?: AbortSignal): Promise<League[]> {
-  const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "/api" : "https://fantasyfim.com/api")).replace(/\/$/, "");
-  const response = await fetch(`${baseUrl}/leagues`, { signal });
+  const baseUrl = (
+    import.meta.env["VITE_API_BASE_URL"] ??
+    (import.meta.env.DEV ? "/api" : "https://fantasyfim.com/api")
+  ).replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/leagues`, { signal: signal ?? null });
   if (!response.ok) {
     throw new Error(`Unable to load leagues (${response.status})`);
   }
   const leagues: unknown = await response.json();
-  if (!Array.isArray(leagues) || !leagues.every((league) =>
-    league && typeof league.league_id === "number" &&
-    typeof league.league_name === "string" && typeof league.is_fim === "boolean"
-  )) {
+  if (
+    !Array.isArray(leagues) ||
+    !leagues.every(
+      (league) =>
+        league &&
+        typeof league.league_id === "number" &&
+        typeof league.league_name === "string" &&
+        typeof league.is_fim === "boolean",
+    )
+  ) {
     throw new Error("The API returned an invalid league list");
   }
   return leagues as League[];
 }
 
-export const useLeagues = () => useQuery({
-  queryKey: ["leagues"],
-  queryFn: ({ signal }) => fetchLeagues(signal),
-});
+export const useLeagues = () =>
+  useQuery({
+    queryKey: ["leagues"],
+    queryFn: ({ signal }) => fetchLeagues(signal),
+  });

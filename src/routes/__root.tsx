@@ -9,6 +9,8 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { themeScript } from "../lib/theme";
 
 import appCss from "../styles.css?url";
 
@@ -98,8 +100,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />
       </head>
       <body>
@@ -123,12 +126,14 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-lg">
-          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
             <Link to="/" className="flex items-center gap-2 text-lg font-extrabold tracking-tight">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">F</span>
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
+                F
+              </span>
               Fantasy <span className="text-primary">FiM</span>
             </Link>
-            <nav className="flex items-center gap-1">
+            <nav aria-label="Main navigation" className="flex flex-wrap items-center gap-1">
               {nav.map((n) => (
                 <Link
                   key={n.to}
@@ -139,7 +144,10 @@ function RootComponent() {
                   {n.label}
                 </Link>
               ))}
-              <button className="ml-3 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90">Sign in</button>
+              <ThemeToggle />
+              <button className="ml-3 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
+                Sign in
+              </button>
             </nav>
           </div>
         </header>
