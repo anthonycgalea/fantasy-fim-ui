@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EventDataPage } from "@/components/events/EventDataPage";
 import { getDifficultyHue, getEpaRanges, sortEvents } from "@/lib/event-data";
-import type { EventData } from "@/api/useEventData";
+import { fetchEventData, type EventData } from "@/api/useEventData";
 
 const events: EventData[] = [
   {
@@ -89,6 +89,56 @@ describe("Event data", () => {
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
+
+  it("accepts decimal strings from the real API response", async () => {
+    mockData([
+      {
+        avgepa: "1703.7500000000000000",
+        event_name: "FIM District Troy Event",
+        maxepa: 2151,
+        medianepa: 1695.5,
+        teamcount: 12,
+        top24epa: null,
+        top8epa: 1657,
+      },
+      {
+        avgepa: "1610.6153846153846154",
+        event_name: "FIM District Chelsea Event",
+        maxepa: 2001,
+        medianepa: 1589,
+        teamcount: 13,
+        top24epa: null,
+        top8epa: 1561,
+      },
+    ]);
+    renderPage();
+    const table = await screen.findByRole("table");
+    const troy = within(table)
+      .getByRole("rowheader", { name: "FIM District Troy Event" })
+      .closest("tr")!;
+    expect(
+      within(troy)
+        .getAllByRole("cell")
+        .map((cell) => cell.textContent),
+    ).toEqual(["12", "2,151", "1,657", "—", "1704", "1,695.5"]);
+    fireEvent.click(screen.getByRole("button", { name: "Average EPA" }));
+    expect(
+      within(table)
+        .getAllByRole("rowheader")
+        .map((cell) => cell.textContent),
+    ).toEqual(["FIM District Chelsea Event", "FIM District Troy Event"]);
+    const normalized = await fetchEventData();
+    expect(normalized[0]?.avgepa).toBe(1703.75);
+    expect(normalized[0]?.top24epa).toBeNull();
+  });
+
+  it.each(["", "unknown", "NaN", "Infinity", true, {}])(
+    "rejects invalid numeric statistics: %s",
+    async (value) => {
+      mockData([{ ...events[0], avgepa: value }]);
+      await expect(fetchEventData()).rejects.toThrow("invalid event statistic");
+    },
+  );
 
   it("toggles numeric sorting and exposes the selected direction", async () => {
     mockData();
