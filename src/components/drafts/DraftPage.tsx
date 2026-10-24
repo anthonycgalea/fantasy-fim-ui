@@ -161,6 +161,7 @@ export function DraftPage({
         <AvailableTeams
           draftId={draftId}
           isFim={league.data.is_fim}
+          leagueYear={league.data.year}
           epaYear={epaYear}
           offseason={league.data.offseason ?? false}
           interval={interval}

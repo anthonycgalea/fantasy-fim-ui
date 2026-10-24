@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAvailableTeams } from "@/api/drafts";
 import { EmptyPanel } from "@/components/PageHeader";
 import { TeamCard } from "./TeamCard";
+import { AvailableTeamsTable } from "./AvailableTeamsTable";
 import { ErrorPanel, LoadingPanel } from "./QueryPanel";
 
 const weeks = [1, 2, 3, 4, 5, 6];
@@ -9,12 +10,14 @@ export function AvailableTeams({
   draftId,
   isFim,
   epaYear,
+  leagueYear,
   interval,
   offseason = false,
 }: {
   draftId: string;
   isFim: boolean;
   epaYear: number;
+  leagueYear: number;
   interval: number | false;
   offseason?: boolean;
 }) {
@@ -95,6 +98,8 @@ export function AvailableTeams({
               : "No teams are available for this draft."
           }
         />
+      ) : !offseason ? (
+        <AvailableTeamsTable teams={teams} leagueYear={leagueYear} />
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {teams.map((team) => (

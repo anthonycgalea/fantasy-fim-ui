@@ -66,7 +66,16 @@ const order = [
 ];
 const available = [
   { team_number: 1, name: "Low EPA", events: [{ week: 1, event_key: "a" }], year_end_epa: 5 },
-  { team_number: 2, name: "High EPA", events: [{ week: 6, event_key: "b" }], year_end_epa: 70 },
+  {
+    team_number: 2,
+    name: "High EPA",
+    events: [
+      { week: 6, event_key: "2026micmp" },
+      { week: 1, event_key: "2026miket" },
+      { week: 1, event_key: "2026mike2" },
+    ],
+    year_end_epa: 70,
+  },
   {
     team_number: 3,
     name: "Missing EPA",
@@ -168,19 +177,46 @@ describe("Draft flow", () => {
     renderPage();
     const section = await screen.findByRole("region", { name: "Available teams" });
     await within(section).findByText("High EPA");
+    const table = within(section).getByRole("table");
     expect(
-      within(section)
-        .getAllByRole("link")
-        .map((link) => link.textContent),
+      within(table)
+        .getAllByRole("columnheader")
+        .map((cell) => cell.textContent),
     ).toEqual([
-      expect.stringContaining("High EPA"),
-      expect.stringContaining("Low EPA"),
-      expect.stringContaining("Missing EPA"),
+      "Team Number",
+      "Team Name",
+      "",
+      "2025 XP",
+      "Week 1",
+      "Week 2",
+      "Week 3",
+      "Week 4",
+      "Week 5",
+      "Week 6",
     ]);
+    expect(
+      within(table)
+        .getAllByRole("row")
+        .slice(1)
+        .map((row) => row.querySelector("td")?.textContent),
+    ).toEqual(["High EPA", "Low EPA", "Missing EPA"]);
+    const highRow = within(table).getByText("High EPA").closest("tr")!;
+    expect(within(highRow).getAllByRole("cell")[2]).toHaveTextContent("70");
+    expect(within(highRow).getByRole("link", { name: "micmp" })).toHaveAttribute(
+      "href",
+      "https://www.thebluealliance.com/event/2026micmp",
+    );
+    expect(within(highRow).getByRole("link", { name: "miket" })).toHaveAttribute(
+      "href",
+      "https://www.thebluealliance.com/event/2026miket",
+    );
+    expect(within(highRow).getByRole("link", { name: "mike2" })).toBeInTheDocument();
     fireEvent.click(within(section).getByRole("checkbox", { name: "Week 6" }));
+    expect(within(section).getByText("High EPA")).toBeInTheDocument();
+    fireEvent.click(within(section).getByRole("checkbox", { name: "Week 1" }));
     expect(within(section).queryByText("High EPA")).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "missing" } });
-    expect(within(section).getAllByRole("link")).toHaveLength(1);
+    expect(within(section).getAllByRole("row")).toHaveLength(2);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "nothing" } });
     expect(within(section).getByText("No teams match your filters.")).toBeInTheDocument();
   });
@@ -211,6 +247,9 @@ describe("Draft flow", () => {
     );
     expect(await screen.findByRole("heading", { name: "Draft board" })).toBeInTheDocument();
     expect(await screen.findByText("High EPA")).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "Available teams" })).queryByRole("table"),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     expect(screen.queryAllByText("No scheduled weeks")).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "League Weeks" })).not.toBeInTheDocument();

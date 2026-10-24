@@ -161,8 +161,19 @@ function RootComponent() {
         >
           <Outlet />
         </main>
-        <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-          Fantasy FiM · Not affiliated with FIRST® or FIRST in Michigan
+        <footer className="space-y-2 border-t px-4 py-6 text-center text-xs text-muted-foreground">
+          <p>
+            Powered by{" "}
+            <a
+              href="https://www.thebluealliance.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:underline"
+            >
+              The Blue Alliance
+            </a>
+          </p>
+          <p>Fantasy FiM · Not affiliated with FIRST® or FIRST in Michigan</p>
         </footer>
       </div>
     </QueryClientProvider>
