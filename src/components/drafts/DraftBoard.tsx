@@ -99,12 +99,15 @@ export function DraftBoard({
                         year={year}
                         pickNumber={pickNumber}
                         hideEmptyWeeks={offseason}
+                        compact={offseason}
                       />
                     ) : (
                       <div
-                        className={`relative flex min-h-36 flex-col justify-end rounded-xl border border-dashed p-4 ${pickNumber === nextPick ? "border-primary bg-accent/40" : "bg-muted/30"}`}
+                        className={`relative flex flex-col justify-end border border-dashed ${offseason ? "min-h-24 rounded-lg p-2.5" : "min-h-36 rounded-xl p-4"} ${pickNumber === nextPick ? "border-primary bg-accent/40" : "bg-muted/30"}`}
                       >
-                        <span className="absolute right-3 top-3 text-xs font-semibold text-muted-foreground">
+                        <span
+                          className={`absolute text-xs font-semibold text-muted-foreground ${offseason ? "right-2.5 top-2.5" : "right-3 top-3"}`}
+                        >
                           {pickNumber}
                         </span>
                         <span className="text-sm font-semibold text-muted-foreground">

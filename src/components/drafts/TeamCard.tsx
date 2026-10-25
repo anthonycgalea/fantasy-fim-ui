@@ -10,6 +10,7 @@ export function TeamCard({
   avatarYear = year,
   pickNumber,
   hideEmptyWeeks = false,
+  compact = false,
 }: {
   number: string | number;
   name?: string;
@@ -19,6 +20,7 @@ export function TeamCard({
   avatarYear?: number;
   pickNumber?: number;
   hideEmptyWeeks?: boolean;
+  compact?: boolean;
 }) {
   const [failedAvatar, setFailedAvatar] = useState(false);
   const weeks = events
@@ -30,24 +32,30 @@ export function TeamCard({
       href={`https://www.thebluealliance.com/team/${number}/${year}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex min-h-36 flex-col rounded-xl border bg-card p-4 shadow-soft transition hover:border-primary/50 hover:bg-accent/40 focus-visible:outline-2 focus-visible:outline-ring"
+      className={`group relative flex flex-col border bg-card shadow-soft transition hover:border-primary/50 hover:bg-accent/40 focus-visible:outline-2 focus-visible:outline-ring ${compact ? "min-h-24 rounded-lg p-2.5" : "min-h-36 rounded-xl p-4"}`}
     >
       {pickNumber !== undefined && (
-        <span className="absolute right-3 top-3 text-xs font-semibold text-muted-foreground">
+        <span
+          className={`absolute text-xs font-semibold text-muted-foreground ${compact ? "right-2.5 top-2.5" : "right-3 top-3"}`}
+        >
           {pickNumber}
         </span>
       )}
       <div
         className={`flex items-start justify-between gap-2 ${pickNumber !== undefined ? "pr-8" : ""}`}
       >
-        <span className="text-2xl font-extrabold tracking-tight text-primary">{number}</span>
+        <span
+          className={`${compact ? "text-xl" : "text-2xl"} font-extrabold tracking-tight text-primary`}
+        >
+          {number}
+        </span>
         {!failedAvatar && (
           <img
             src={`https://www.thebluealliance.com/avatar/${avatarYear}/frc${number}.png`}
             alt=""
             loading="lazy"
             onError={() => setFailedAvatar(true)}
-            className={`h-8 w-8 rounded-md ${pickNumber !== undefined ? "absolute bottom-3 right-3" : ""}`}
+            className={`rounded-md ${compact ? "h-6 w-6" : "h-8 w-8"} ${pickNumber !== undefined ? (compact ? "absolute bottom-2.5 right-2.5" : "absolute bottom-3 right-3") : ""}`}
           />
         )}
       </div>
@@ -57,12 +65,12 @@ export function TeamCard({
         </span>
       )}
       {(weeks.length > 0 || !hideEmptyWeeks) && (
-        <span className="mt-2 text-xs text-muted-foreground">
+        <span className={`${compact ? "mt-1" : "mt-2"} text-xs text-muted-foreground`}>
           {weeks.length ? `Weeks ${weeks.join(", ")}` : "No scheduled weeks"}
         </span>
       )}
       <span
-        className={`mt-auto pt-2 text-xs font-semibold ${pickNumber !== undefined ? "pr-10" : ""}`}
+        className={`mt-auto text-xs font-semibold ${compact ? "pt-1" : "pt-2"} ${pickNumber !== undefined ? (compact ? "pr-8" : "pr-10") : ""}`}
       >
         EPA <span className="text-muted-foreground">{epa ?? "N/A"}</span>
       </span>
