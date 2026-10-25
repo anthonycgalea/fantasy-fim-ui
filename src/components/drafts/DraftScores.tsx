@@ -30,7 +30,7 @@ export function DraftScores({ draftId }: { draftId: string }) {
           {draft.data.event_key} · {league.data.year} · {league.data.weekly_starts} scoring starts
         </PageHeader>
         <Button asChild variant="outline">
-          <Link to="/drafts/$draftId" params={{ draftId }} search={{ autoRefreshInterval: false }}>
+          <Link to="/drafts/$draftId" params={{ draftId }} search={{ autoRefreshInterval: 15000 }}>
             View Draft
           </Link>
         </Button>

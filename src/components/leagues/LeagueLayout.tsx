@@ -60,7 +60,7 @@ export function LeagueLayout({ leagueId }: { leagueId: string }) {
           <Link
             to="/drafts/$draftId"
             params={{ draftId: String(firstDraft.draft_id) }}
-            search={{ autoRefreshInterval: false }}
+            search={{ autoRefreshInterval: 15000 }}
             className={navClass}
           >
             Draft

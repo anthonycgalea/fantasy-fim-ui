@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Settings } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   getEpaYear,
@@ -17,7 +19,7 @@ import { ErrorPanel, LoadingPanel } from "./QueryPanel";
 
 export function DraftPage({
   draftId,
-  interval = false,
+  interval = 15000,
   initialTab = "draft",
 }: {
   draftId: string;
@@ -58,22 +60,65 @@ export function DraftPage({
             {draft.data.event_key ? ` · ${draft.data.event_key}` : ""} · {draft.data.rounds} rounds
           </p>
         </div>
-        {league.data.offseason ? (
-          <Button asChild>
-            <Link to="/drafts/$draftId/scores" params={{ draftId }}>
-              View Draft Scores
-            </Link>
-          </Button>
-        ) : (
-          <Button asChild variant="outline">
-            <Link to="/leagues/$leagueId" params={{ leagueId: String(league.data.league_id) }}>
-              Back to League
-            </Link>
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {league.data.offseason ? (
+            <Button asChild>
+              <Link to="/drafts/$draftId/scores" params={{ draftId }}>
+                View Draft Scores
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline">
+              <Link to="/leagues/$leagueId" params={{ leagueId: String(league.data.league_id) }}>
+                Back to League
+              </Link>
+            </Button>
+          )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Draft settings"
+                title="Draft settings"
+              >
+                <Settings className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-64" aria-label="Draft settings">
+              <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                Auto-refresh
+                <select
+                  aria-label="Auto-refresh"
+                  value={interval || "off"}
+                  onChange={(event) => {
+                    void navigate({
+                      to: "/drafts/$draftId",
+                      params: { draftId },
+                      search: {
+                        autoRefreshInterval:
+                          event.target.value === "off" ? false : Number(event.target.value),
+                      },
+                      replace: true,
+                    });
+                  }}
+                  className="rounded-lg border bg-card px-3 py-2 text-foreground"
+                >
+                  <option value="off">Off</option>
+                  {interval && ![5000, 15000, 30000].includes(interval) && (
+                    <option value={interval}>{interval / 1000} seconds</option>
+                  )}
+                  <option value="5000">5 seconds</option>
+                  <option value="15000">15 seconds</option>
+                  <option value="30000">30 seconds</option>
+                </select>
+              </label>
+            </PopoverContent>
+          </Popover>
+        </div>
       </header>
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-        {!league.data.offseason ? (
+      {!league.data.offseason && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div
             role="group"
             aria-label="Draft views"
@@ -94,39 +139,8 @@ export function DraftPage({
               League Weeks
             </Button>
           </div>
-        ) : (
-          <Button asChild variant="outline">
-            <Link to="/offseasons">All offseasons</Link>
-          </Button>
-        )}
-        <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-          Auto-refresh
-          <select
-            aria-label="Auto-refresh"
-            value={interval || "off"}
-            onChange={(event) => {
-              void navigate({
-                to: "/drafts/$draftId",
-                params: { draftId },
-                search: {
-                  autoRefreshInterval:
-                    event.target.value === "off" ? false : Number(event.target.value),
-                },
-                replace: true,
-              });
-            }}
-            className="rounded-lg border bg-card px-3 py-2 text-foreground"
-          >
-            <option value="off">Off</option>
-            {interval && ![5000, 15000, 30000].includes(interval) && (
-              <option value={interval}>{interval / 1000} seconds</option>
-            )}
-            <option value="5000">5 seconds</option>
-            <option value="15000">15 seconds</option>
-            <option value="30000">30 seconds</option>
-          </select>
-        </label>
-      </div>
+        </div>
+      )}
       {boardQueries.some((query) => query.isError) ? (
         <ErrorPanel
           label="Draft data couldn’t be loaded."

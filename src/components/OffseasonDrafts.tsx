@@ -49,7 +49,7 @@ function OffseasonCard({
         <Link
           to="/drafts/$draftId"
           params={{ draftId: String(latest.draft_id) }}
-          search={{ autoRefreshInterval: false }}
+          search={{ autoRefreshInterval: 15000 }}
           className={`${cardClass} transition hover:border-primary/50 hover:bg-accent/30 focus-visible:outline-2 focus-visible:outline-ring`}
         >
           <h2 className="text-lg font-bold">{league.league_name}</h2>

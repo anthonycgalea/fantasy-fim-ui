@@ -31,7 +31,7 @@ export function LeagueDrafts({ leagueId }: { leagueId: string }) {
                 key={draft.draft_id}
                 to="/drafts/$draftId"
                 params={{ draftId: String(draft.draft_id) }}
-                search={{ autoRefreshInterval: false }}
+                search={{ autoRefreshInterval: 15000 }}
                 className="rounded-2xl border bg-card p-6 shadow-soft transition hover:border-primary/50 hover:bg-accent/30"
               >
                 <span className="text-xs font-semibold text-muted-foreground">

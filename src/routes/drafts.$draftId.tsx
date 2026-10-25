@@ -5,7 +5,7 @@ import { DraftPage } from "@/components/drafts/DraftPage";
 export const Route = createFileRoute("/drafts/$draftId")({
   head: () => ({ meta: [{ title: "Draft · Fantasy FiM" }] }),
   validateSearch: (search: Record<string, unknown>) => ({
-    autoRefreshInterval: parseRefreshInterval(search["autoRefreshInterval"]),
+    autoRefreshInterval: parseRefreshInterval(search["autoRefreshInterval"] ?? 15000),
   }),
   component: DraftRoute,
 });

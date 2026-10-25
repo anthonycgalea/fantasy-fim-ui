@@ -275,9 +275,14 @@ describe("Draft flow", () => {
   });
 
   it("changes auto-refresh through the draft URL", async () => {
-    mockApi();
+    mockApi(true);
     renderPage();
-    fireEvent.change(await screen.findByRole("combobox", { name: "Auto-refresh" }), {
+    const settings = await screen.findByRole("button", { name: "Draft settings" });
+    expect(screen.queryByRole("link", { name: "All offseasons" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("combobox", { name: "Auto-refresh" })).not.toBeInTheDocument();
+    fireEvent.click(settings);
+    expect(screen.getByRole("combobox", { name: "Auto-refresh" })).toHaveValue("15000");
+    fireEvent.change(screen.getByRole("combobox", { name: "Auto-refresh" }), {
       target: { value: "5000" },
     });
     expect(navigate).toHaveBeenCalledWith({
