@@ -42,7 +42,8 @@ function OffseasonCard({
     (largest, draft) => (!largest || draft.draft_id > largest.draft_id ? draft : largest),
     undefined,
   );
-  const cardClass = "block h-full min-h-40 rounded-2xl border bg-card p-6 shadow-soft";
+  const cardClass =
+    "block h-full w-full rounded-2xl border bg-card p-6 text-left shadow-soft transition hover:border-primary/50 hover:bg-accent/30 focus-visible:outline-2 focus-visible:outline-ring";
   return (
     <li ref={card}>
       {latest ? (
@@ -50,31 +51,24 @@ function OffseasonCard({
           to="/drafts/$draftId"
           params={{ draftId: String(latest.draft_id) }}
           search={{ autoRefreshInterval: 15000 }}
-          className={`${cardClass} transition hover:border-primary/50 hover:bg-accent/30 focus-visible:outline-2 focus-visible:outline-ring`}
+          className={cardClass}
         >
           <h2 className="text-lg font-bold">{league.league_name}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {league.year}
-            {latest.event_key ? ` · ${latest.event_key}` : ""}
-          </p>
-          <span className="mt-4 inline-block text-sm font-semibold text-primary">View draft →</span>
         </Link>
+      ) : query.isError ? (
+        <button
+          type="button"
+          className={cardClass}
+          title="Draft couldn’t be loaded. Click to retry."
+          onClick={() => {
+            void query.refetch();
+          }}
+        >
+          <h2 className="text-lg font-bold">{league.league_name}</h2>
+        </button>
       ) : (
         <div className={cardClass}>
-          <h2 className="mb-3 text-lg font-bold">{league.league_name}</h2>
-          {query.isError ? (
-            <ErrorPanel
-              label={`Draft for ${league.league_name} couldn’t be loaded.`}
-              retry={() => {
-                void query.refetch();
-              }}
-              busy={query.isFetching}
-            />
-          ) : (
-            <p role="status" className="text-sm text-muted-foreground">
-              Loading draft link…
-            </p>
-          )}
+          <h2 className="text-lg font-bold">{league.league_name}</h2>
         </div>
       )}
     </li>

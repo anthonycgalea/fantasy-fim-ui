@@ -106,7 +106,7 @@ export function DraftBoard({
                     ) : (
                       <div
                         aria-current={pickNumber === nextPick ? "step" : undefined}
-                        className={`relative flex flex-col justify-end border ${offseason ? "min-h-24 rounded-lg p-2.5" : "min-h-36 rounded-xl p-4"} ${pickNumber === nextPick ? "border-yellow-500 bg-yellow-100 text-yellow-950 dark:border-yellow-400 dark:bg-yellow-950 dark:text-yellow-100" : "border-dashed bg-muted/30"}`}
+                        className={`relative flex flex-col border ${pickNumber === nextPick ? "items-center justify-center text-center" : "justify-end"} ${offseason ? "min-h-24 rounded-lg p-2.5" : "min-h-36 rounded-xl p-4"} ${pickNumber === nextPick ? "border-yellow-500 bg-yellow-100 text-yellow-950 dark:border-yellow-400 dark:bg-yellow-950 dark:text-yellow-100" : "border-dashed bg-muted/30"}`}
                       >
                         <span
                           className={`absolute text-xs font-semibold text-muted-foreground ${offseason ? "right-2.5 top-2.5" : "right-3 top-3"}`}

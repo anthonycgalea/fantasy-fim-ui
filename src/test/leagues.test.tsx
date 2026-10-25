@@ -165,7 +165,7 @@ describe("Offseason leagues", () => {
     renderPage(true);
     expect(screen.getByRole("heading", { name: "Offseasons" })).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Loading offseasons");
-    await screen.findByRole("link", { name: /2026second42/ });
+    await screen.findByRole("link", { name: "Latest offseason" });
     expect(
       screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent),
     ).toEqual(["Latest offseason", "Middle offseason", "Earlier offseason"]);
@@ -305,7 +305,7 @@ describe("Offseason leagues", () => {
       })),
     );
     renderPage(true);
-    expect(await screen.findByRole("link", { name: /2026ready/ })).toHaveAttribute(
+    expect(await screen.findByRole("link", { name: "Ready offseason" })).toHaveAttribute(
       "href",
       "/drafts/7",
     );
@@ -375,13 +375,16 @@ describe("Offseason leagues", () => {
       }),
     );
     renderPage(true);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Retry offseason");
-    expect(await screen.findByRole("link", { name: /2026ready/ })).toHaveAttribute(
+    expect(await screen.findByRole("button", { name: "Retry offseason" })).toHaveAttribute(
+      "title",
+      "Draft couldn’t be loaded. Click to retry.",
+    );
+    expect(await screen.findByRole("link", { name: "Ready offseason" })).toHaveAttribute(
       "href",
       "/drafts/7",
     );
-    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-    expect(await screen.findByRole("link", { name: /2026retry/ })).toHaveAttribute(
+    fireEvent.click(screen.getByRole("button", { name: "Retry offseason" }));
+    expect(await screen.findByRole("link", { name: "Retry offseason" })).toHaveAttribute(
       "href",
       "/drafts/8",
     );
