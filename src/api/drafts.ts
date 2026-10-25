@@ -15,7 +15,7 @@ export type AvailableTeam = {
   team_number: number;
   name: string;
   events: TeamEvent[];
-  match13_xp: number | null;
+  match13_xp?: number | null;
 };
 export type WeekStatus = { year: number; week: number };
 export type ScoreBreakdown = {

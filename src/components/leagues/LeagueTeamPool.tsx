@@ -1,3 +1,4 @@
+import { useTeamPoolXp } from "@/api/useTeamPoolXp";
 import { compareXpDescending } from "@/lib/xp";
 import { useState } from "react";
 import { getXpYear, useLeague, useCurrentWeek } from "@/api/drafts";
@@ -17,6 +18,8 @@ export function LeagueTeamPool({
   const league = useLeague(Number(leagueId));
   const pool = useLeagueTeamPool(leagueId, waiver);
   const currentWeek = useCurrentWeek();
+  const xpYear = league.data ? getXpYear(league.data, currentWeek.data) : undefined;
+  const poolXp = useTeamPoolXp(pool.data, xpYear);
   const [selectedWeeks, setSelectedWeeks] = useState(weekOptions);
   const [search, setSearch] = useState("");
   const title = waiver ? "Teams on waivers" : "Available teams";
@@ -33,14 +36,13 @@ export function LeagueTeamPool({
       />
     );
   if (!league.data || !pool.data) return <LoadingPanel label={`Loading ${title.toLowerCase()}…`} />;
-  const teams = [...pool.data]
+  const teams = [...poolXp.teams]
     .sort((a, b) => compareXpDescending(a.match13_xp, b.match13_xp))
     .filter(
       (team) =>
         (!league.data.is_fim || team.events.some((event) => selectedWeeks.includes(event.week))) &&
         `${team.team_number} ${team.name}`.toLowerCase().includes(search.trim().toLowerCase()),
     );
-  const xpYear = getXpYear(league.data, currentWeek.data);
   return (
     <section aria-labelledby={waiver ? "waiver-teams-title" : "league-available-title"}>
       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
@@ -66,6 +68,20 @@ export function LeagueTeamPool({
           />
         </label>
       </div>
+      {poolXp.loading && (
+        <p role="status" className="mb-3 text-sm text-muted-foreground">
+          Loading XP…
+        </p>
+      )}
+      {poolXp.xp.isError && (
+        <ErrorPanel
+          label="XP couldn’t be loaded."
+          retry={() => {
+            void poolXp.xp.refetch();
+          }}
+          busy={poolXp.xp.isFetching}
+        />
+      )}
       {league.data.is_fim && (
         <fieldset className="mb-5 flex flex-wrap gap-2">
           <legend className="mb-2 text-xs font-semibold text-muted-foreground">
@@ -112,7 +128,7 @@ export function LeagueTeamPool({
               name={team.name}
               events={team.events}
               xp={team.match13_xp ?? null}
-              year={xpYear}
+              year={xpYear ?? league.data.year}
             />
           ))}
         </div>

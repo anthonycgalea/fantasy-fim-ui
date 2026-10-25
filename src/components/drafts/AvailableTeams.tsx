@@ -1,3 +1,4 @@
+import { useTeamPoolXp } from "@/api/useTeamPoolXp";
 import { compareXpDescending } from "@/lib/xp";
 import { useState } from "react";
 import { useAvailableTeams } from "@/api/drafts";
@@ -23,9 +24,10 @@ export function AvailableTeams({
   offseason?: boolean;
 }) {
   const available = useAvailableTeams(draftId, interval);
+  const poolXp = useTeamPoolXp(available.data, xpYear);
   const [selectedWeeks, setSelectedWeeks] = useState(weeks);
   const [search, setSearch] = useState("");
-  const teams = [...(available.data ?? [])]
+  const teams = [...poolXp.teams]
     .sort((a, b) => compareXpDescending(a.match13_xp, b.match13_xp))
     .filter(
       (team) =>
@@ -54,6 +56,20 @@ export function AvailableTeams({
           />
         </label>
       </div>
+      {poolXp.loading && (
+        <p role="status" className="mb-3 text-sm text-muted-foreground">
+          Loading XP…
+        </p>
+      )}
+      {poolXp.xp.isError && (
+        <ErrorPanel
+          label="XP couldn’t be loaded."
+          retry={() => {
+            void poolXp.xp.refetch();
+          }}
+          busy={poolXp.xp.isFetching}
+        />
+      )}
       {isFim && (
         <fieldset className="mb-5 flex flex-wrap gap-2">
           <legend className="mb-2 text-xs font-semibold text-muted-foreground">

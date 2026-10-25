@@ -53,7 +53,7 @@ const teams = [
 const pool = [
   { team_number: 27, name: "Low XP", events: [{ event_key: "a", week: 1 }], match13_xp: 30 },
   { team_number: 33, name: "High XP", events: [{ event_key: "b", week: 6 }], match13_xp: 90 },
-  { team_number: 67, name: "Unknown XP", events: [{ event_key: "c", week: 3 }] },
+  { team_number: 67, name: "Unknown XP", events: [{ event_key: "c", week: 3 }], match13_xp: null },
 ];
 const breakdown = {
   qual_points: 25,
@@ -250,6 +250,28 @@ describe("League pages", () => {
     fireEvent.change(select, { target: { value: "all" } });
     expect(await screen.findByRole("region", { name: "Alpha" })).toBeInTheDocument();
   });
+
+  it.each([false, true])(
+    "loads missing pool XP for league available teams and waivers (waiver: %s)",
+    async (waiver) => {
+      const missingXpPool = pool.map(({ match13_xp: _xp, ...team }) => team);
+      const fetch = mockApi({
+        "/api/leagues/2/availableTeams": missingXpPool,
+        "/api/leagues/2/teamsOnWaivers": missingXpPool,
+        "/api/xp?teams=27,33,67&year=2026": { "27": 0, "33": 2129.6, "67": null },
+      });
+      renderPage(<LeagueTeamPool leagueId="2" waiver={waiver} />);
+      await screen.findByText("2130");
+      expect(fetch).toHaveBeenCalledWith("/api/xp?teams=27,33,67&year=2026", expect.anything());
+      expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual([
+        expect.stringContaining("High XP"),
+        expect.stringContaining("Low XP"),
+        expect.stringContaining("Unknown XP"),
+      ]);
+      expect(screen.getByText("0")).toBeInTheDocument();
+      expect(screen.getByText("—")).toBeInTheDocument();
+    },
+  );
 
   it("filters available teams by week and name while preserving XP order", async () => {
     mockApi();

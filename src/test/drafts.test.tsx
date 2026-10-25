@@ -240,6 +240,41 @@ describe("Draft flow", () => {
     ]);
   });
 
+  it.each([false, true])(
+    "loads and sorts XP omitted by the available-team response (offseason: %s)",
+    async (offseason) => {
+      const originalFetch = mockApi(offseason, {
+        "/api/drafts/7/availableTeams": available.map(({ match13_xp: _xp, ...team }) => team),
+      });
+      const fetch = vi.fn(async (url: string) =>
+        url === "/api/xp?teams=1,2,3&year=2026"
+          ? { ok: true, json: async () => ({ "1": 0, "2": 2129.6, "3": null }) }
+          : originalFetch(url),
+      );
+      vi.stubGlobal("fetch", fetch);
+      renderPage();
+      const section = await screen.findByRole("region", { name: "Available teams" });
+      await waitFor(() => expect(within(section).getByText("2130")).toBeInTheDocument());
+      expect(fetch).toHaveBeenCalledWith("/api/xp?teams=1,2,3&year=2026", expect.anything());
+      expect(within(section).getByText("0")).toBeInTheDocument();
+      expect(within(section).getAllByText("—").length).toBeGreaterThan(0);
+      const names = offseason
+        ? within(section)
+            .getAllByRole("link")
+            .filter((link) => link.getAttribute("href")?.includes("/team/"))
+            .map((link) => link.textContent)
+        : within(section)
+            .getAllByRole("row")
+            .slice(1)
+            .map((row) => row.textContent);
+      expect(names).toEqual([
+        expect.stringContaining("High XP"),
+        expect.stringContaining("Low XP"),
+        expect.stringContaining("Missing XP"),
+      ]);
+    },
+  );
+
   it("sorts available teams by XP, filters weeks and searches by name", async () => {
     mockApi();
     renderPage();
