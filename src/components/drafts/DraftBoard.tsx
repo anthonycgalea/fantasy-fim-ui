@@ -38,7 +38,9 @@ export function DraftBoard({
   if (!order.length) return <EmptyPanel label="The draft order hasn’t been set yet." />;
   if (rounds < 1) return <EmptyPanel label="No draft rounds have been set yet." />;
   const rows = buildDraftRows(sortedOrder, picks, rounds);
-  const filled = new Set(picks.map((pick) => pick.pick_number));
+  const filled = new Set(
+    picks.filter((pick) => /^\d+$/.test(pick.team_picked)).map((pick) => pick.pick_number),
+  );
   const nextPick = Array.from({ length: order.length * rounds }, (_, i) => i + 1).find(
     (number) => !filled.has(number),
   );
@@ -91,7 +93,7 @@ export function DraftBoard({
                 </th>
                 {row.map(({ pickNumber, pick }) => (
                   <td key={pickNumber} data-pick={pickNumber} className="align-top">
-                    {pick && pick.team_picked !== "-1" ? (
+                    {pick && filled.has(pickNumber) ? (
                       <TeamCard
                         number={pick.team_picked}
                         events={pick.events ?? []}
@@ -103,20 +105,17 @@ export function DraftBoard({
                       />
                     ) : (
                       <div
-                        className={`relative flex flex-col justify-end border border-dashed ${offseason ? "min-h-24 rounded-lg p-2.5" : "min-h-36 rounded-xl p-4"} ${pickNumber === nextPick ? "border-primary bg-accent/40" : "bg-muted/30"}`}
+                        aria-current={pickNumber === nextPick ? "step" : undefined}
+                        className={`relative flex flex-col justify-end border ${offseason ? "min-h-24 rounded-lg p-2.5" : "min-h-36 rounded-xl p-4"} ${pickNumber === nextPick ? "border-yellow-500 bg-yellow-100 text-yellow-950 dark:border-yellow-400 dark:bg-yellow-950 dark:text-yellow-100" : "border-dashed bg-muted/30"}`}
                       >
                         <span
                           className={`absolute text-xs font-semibold text-muted-foreground ${offseason ? "right-2.5 top-2.5" : "right-3 top-3"}`}
                         >
                           {pickNumber}
                         </span>
-                        <span className="text-sm font-semibold text-muted-foreground">
-                          {pick
-                            ? "Skipped"
-                            : pickNumber === nextPick
-                              ? "On the clock"
-                              : "Awaiting pick"}
-                        </span>
+                        {pickNumber === nextPick && (
+                          <span className="text-sm font-semibold">Picking</span>
+                        )}
                       </div>
                     )}
                   </td>

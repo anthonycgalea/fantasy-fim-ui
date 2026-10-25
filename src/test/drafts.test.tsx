@@ -142,7 +142,7 @@ afterEach(() => {
 });
 
 describe("Draft flow", () => {
-  it("renders snake-order picks, skips, empty slots and API EPA", async () => {
+  it("renders snake-order picks, empty slots, the active pick and API EPA", async () => {
     const fetch = mockApi();
     renderPage();
     expect(screen.getByRole("status")).toHaveTextContent("Loading draft information");
@@ -155,8 +155,12 @@ describe("Draft flow", () => {
     const cells = board.querySelectorAll("td");
     expect([...cells].map((cell) => cell.getAttribute("data-pick"))).toEqual(["1", "2", "4", "3"]);
     expect(cells[0]).toHaveTextContent("27");
-    expect(cells[1]).toHaveTextContent("Skipped");
-    expect(cells[2]).toHaveTextContent("On the clock");
+    expect(cells[1]).toHaveTextContent("Picking");
+    expect(cells[1]?.firstElementChild).toHaveAttribute("aria-current", "step");
+    expect(cells[1]?.firstElementChild).toHaveClass("bg-yellow-100");
+    expect(cells[2]?.textContent).toBe("4");
+    expect(within(board).getAllByText("Picking")).toHaveLength(1);
+    expect(screen.queryByText("Skipped")).not.toBeInTheDocument();
     expect(cells[3]).toHaveTextContent("33");
     expect(cells[3]).toHaveTextContent("Weeks 5, 6");
     expect(cells[3]).not.toHaveTextContent("99");
@@ -170,6 +174,27 @@ describe("Draft flow", () => {
       "href",
       "/leagues/2",
     );
+  });
+
+  it("advances the active pick to the lowest unpicked number and clears it when complete", async () => {
+    mockApi(true, {
+      "/api/drafts/7/picks": picks.map((pick) =>
+        pick.pick_number === 2 ? { ...pick, team_picked: "1" } : pick,
+      ),
+    });
+    renderPage();
+    const board = await screen.findByRole("region", { name: /Draft board, scroll/ });
+    expect(board.querySelector('[data-pick="4"]')).toHaveTextContent("Picking");
+    cleanup();
+    mockApi(true, {
+      "/api/drafts/7/picks": [
+        ...picks.map((pick) => (pick.pick_number === 2 ? { ...pick, team_picked: "1" } : pick)),
+        { pick_number: 4, fantasy_team_id: 10, team_picked: "2", events: [] },
+      ],
+    });
+    renderPage();
+    await screen.findByRole("region", { name: /Draft board, scroll/ });
+    expect(screen.queryByText("Picking")).not.toBeInTheDocument();
   });
 
   it("sorts available teams by EPA, filters weeks and searches by name", async () => {
