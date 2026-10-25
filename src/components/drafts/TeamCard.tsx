@@ -1,3 +1,4 @@
+import { formatXp } from "@/lib/xp";
 import { useState } from "react";
 import type { TeamEvent } from "@/api/drafts";
 
@@ -5,7 +6,7 @@ export function TeamCard({
   number,
   name,
   events,
-  epa,
+  xp,
   year,
   avatarYear = year,
   pickNumber,
@@ -15,7 +16,7 @@ export function TeamCard({
   number: string | number;
   name?: string;
   events: TeamEvent[];
-  epa: number | null | undefined;
+  xp: number | null | undefined;
   year: number;
   avatarYear?: number;
   pickNumber?: number;
@@ -72,7 +73,8 @@ export function TeamCard({
       <span
         className={`mt-auto text-xs font-semibold ${compact ? "pt-1" : "pt-2"} ${pickNumber !== undefined ? (compact ? "pr-8" : "pr-10") : ""}`}
       >
-        EPA <span className="text-muted-foreground">{epa ?? "N/A"}</span>
+        <span title="Normalized match13 XP">XP</span>{" "}
+        <span className="text-muted-foreground">{formatXp(xp)}</span>
       </span>
     </a>
   );

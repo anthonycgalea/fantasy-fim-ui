@@ -51,9 +51,9 @@ const teams = [
   { fantasy_team_id: 20, team_name: "Bravo" },
 ];
 const pool = [
-  { team_number: 27, name: "Low EPA", events: [{ event_key: "a", week: 1 }], year_end_epa: 30 },
-  { team_number: 33, name: "High EPA", events: [{ event_key: "b", week: 6 }], year_end_epa: 90 },
-  { team_number: 67, name: "Unknown EPA", events: [{ event_key: "c", week: 3 }] },
+  { team_number: 27, name: "Low XP", events: [{ event_key: "a", week: 1 }], match13_xp: 30 },
+  { team_number: 33, name: "High XP", events: [{ event_key: "b", week: 6 }], match13_xp: 90 },
+  { team_number: 67, name: "Unknown XP", events: [{ event_key: "c", week: 3 }] },
 ];
 const breakdown = {
   qual_points: 25,
@@ -251,7 +251,7 @@ describe("League pages", () => {
     expect(await screen.findByRole("region", { name: "Alpha" })).toBeInTheDocument();
   });
 
-  it("filters available teams by week and name while preserving EPA order", async () => {
+  it("filters available teams by week and name while preserving XP order", async () => {
     mockApi();
     renderPage(<LeagueTeamPool leagueId="2" />);
     const section = await screen.findByRole("region", { name: "Available teams" });
@@ -260,16 +260,16 @@ describe("League pages", () => {
         .getAllByRole("link")
         .map((link) => link.textContent),
     ).toEqual([
-      expect.stringContaining("High EPA"),
-      expect.stringContaining("Low EPA"),
-      expect.stringContaining("Unknown EPA"),
+      expect.stringContaining("High XP"),
+      expect.stringContaining("Low XP"),
+      expect.stringContaining("Unknown XP"),
     ]);
     expect(within(section).queryByRole("checkbox", { name: "Week 5" })).not.toBeInTheDocument();
     fireEvent.click(within(section).getByRole("checkbox", { name: "Week 6" }));
-    expect(within(section).queryByText("High EPA")).not.toBeInTheDocument();
+    expect(within(section).queryByText("High XP")).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "unknown" } });
     expect(within(section).getAllByRole("link")).toHaveLength(1);
-    expect(within(section).getByText("N/A")).toBeInTheDocument();
+    expect(within(section).getByText("—")).toBeInTheDocument();
   });
 
   it("shows non-FiM teams without week filtering", async () => {
@@ -280,7 +280,7 @@ describe("League pages", () => {
       ],
     });
     renderPage(<LeagueTeamPool leagueId="2" />);
-    expect(await screen.findByText("Low EPA")).toBeInTheDocument();
+    expect(await screen.findByText("Low XP")).toBeInTheDocument();
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   });
 
@@ -288,7 +288,7 @@ describe("League pages", () => {
     const fetch = mockApi();
     renderPage(<LeagueWaivers leagueId="2" />);
     expect(await screen.findByRole("region", { name: "Teams on waivers" })).toHaveTextContent(
-      "High EPA",
+      "High XP",
     );
     fireEvent.click(screen.getByRole("button", { name: "Waiver Priority" }));
     const table = await screen.findByRole("table");

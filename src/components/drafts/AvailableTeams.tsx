@@ -1,3 +1,4 @@
+import { compareXpDescending } from "@/lib/xp";
 import { useState } from "react";
 import { useAvailableTeams } from "@/api/drafts";
 import { EmptyPanel } from "@/components/PageHeader";
@@ -9,14 +10,14 @@ const weeks = [1, 2, 3, 4, 5, 6];
 export function AvailableTeams({
   draftId,
   isFim,
-  epaYear,
+  xpYear,
   leagueYear,
   interval,
   offseason = false,
 }: {
   draftId: string;
   isFim: boolean;
-  epaYear: number;
+  xpYear: number;
   leagueYear: number;
   interval: number | false;
   offseason?: boolean;
@@ -25,7 +26,7 @@ export function AvailableTeams({
   const [selectedWeeks, setSelectedWeeks] = useState(weeks);
   const [search, setSearch] = useState("");
   const teams = [...(available.data ?? [])]
-    .sort((a, b) => (b.year_end_epa ?? -Infinity) - (a.year_end_epa ?? -Infinity))
+    .sort((a, b) => compareXpDescending(a.match13_xp, b.match13_xp))
     .filter(
       (team) =>
         (!isFim || team.events.some((event) => selectedWeeks.includes(event.week))) &&
@@ -39,7 +40,7 @@ export function AvailableTeams({
             Available teams
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Highest EPA first{available.data ? ` · ${teams.length} teams` : ""}
+            Highest XP first{available.data ? ` · ${teams.length} teams` : ""}
           </p>
         </div>
         <label className="flex flex-col gap-1 text-xs font-semibold">
@@ -108,8 +109,8 @@ export function AvailableTeams({
               number={team.team_number}
               name={team.name}
               events={team.events}
-              epa={team.year_end_epa}
-              year={epaYear}
+              xp={team.match13_xp}
+              year={xpYear}
               hideEmptyWeeks={offseason}
             />
           ))}

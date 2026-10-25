@@ -3,7 +3,7 @@ import { Settings } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
-  getEpaYear,
+  getXpYear,
   useCurrentWeek,
   useDraft,
   useDraftOrder,
@@ -49,7 +49,7 @@ export function DraftPage({
   if (!draft.data || !league.data) return <LoadingPanel label="Loading draft information…" />;
   const activeTab = league.data.offseason ? "draft" : tab;
   const boardQueries = [picks, teams, ...(activeTab === "draft" ? [order] : [])];
-  const epaYear = getEpaYear(league.data, currentWeek.data);
+  const xpYear = getXpYear(league.data, currentWeek.data);
   return (
     <>
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-l-4 border-l-primary bg-card px-4 py-3 shadow-soft sm:px-5">
@@ -161,7 +161,7 @@ export function DraftPage({
           teams={teams.data ?? []}
           rounds={draft.data.rounds}
           year={league.data.year}
-          epaYear={epaYear}
+          xpYear={xpYear}
           offseason={league.data.offseason ?? false}
         />
       ) : (
@@ -176,7 +176,7 @@ export function DraftPage({
           draftId={draftId}
           isFim={league.data.is_fim}
           leagueYear={league.data.year}
-          epaYear={epaYear}
+          xpYear={xpYear}
           offseason={league.data.offseason ?? false}
           interval={interval}
         />

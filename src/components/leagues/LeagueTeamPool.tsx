@@ -1,5 +1,6 @@
+import { compareXpDescending } from "@/lib/xp";
 import { useState } from "react";
-import { getEpaYear, useLeague, useCurrentWeek } from "@/api/drafts";
+import { getXpYear, useLeague, useCurrentWeek } from "@/api/drafts";
 import { useLeagueTeamPool } from "@/api/leagues";
 import { EmptyPanel } from "@/components/PageHeader";
 import { TeamCard } from "@/components/drafts/TeamCard";
@@ -33,13 +34,13 @@ export function LeagueTeamPool({
     );
   if (!league.data || !pool.data) return <LoadingPanel label={`Loading ${title.toLowerCase()}…`} />;
   const teams = [...pool.data]
-    .sort((a, b) => (b.year_end_epa ?? -Infinity) - (a.year_end_epa ?? -Infinity))
+    .sort((a, b) => compareXpDescending(a.match13_xp, b.match13_xp))
     .filter(
       (team) =>
         (!league.data.is_fim || team.events.some((event) => selectedWeeks.includes(event.week))) &&
         `${team.team_number} ${team.name}`.toLowerCase().includes(search.trim().toLowerCase()),
     );
-  const epaYear = getEpaYear(league.data, currentWeek.data);
+  const xpYear = getXpYear(league.data, currentWeek.data);
   return (
     <section aria-labelledby={waiver ? "waiver-teams-title" : "league-available-title"}>
       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
@@ -51,7 +52,7 @@ export function LeagueTeamPool({
             {title}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Highest EPA first · {teams.length} teams
+            Highest XP first · {teams.length} teams
           </p>
         </div>
         <label className="flex flex-col gap-1 text-xs font-semibold">
@@ -110,8 +111,8 @@ export function LeagueTeamPool({
               number={team.team_number}
               name={team.name}
               events={team.events}
-              epa={team.year_end_epa ?? null}
-              year={epaYear}
+              xp={team.match13_xp ?? null}
+              year={xpYear}
             />
           ))}
         </div>

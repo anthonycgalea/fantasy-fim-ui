@@ -10,7 +10,7 @@ export function DraftBoard({
   teams,
   rounds,
   year,
-  epaYear,
+  xpYear,
   offseason = false,
 }: {
   order: DraftSlot[];
@@ -18,19 +18,19 @@ export function DraftBoard({
   teams: FantasyTeam[];
   rounds: number;
   year: number;
-  epaYear: number;
+  xpYear: number;
   offseason?: boolean;
 }) {
   const sortedOrder = [...order].sort((a, b) => a.draft_slot - b.draft_slot);
   const pickedNumbers = [
     ...new Set(picks.map((pick) => pick.team_picked).filter((team) => /^\d+$/.test(team))),
   ].sort();
-  const epa = useQuery({
-    queryKey: ["draftEpa", epaYear, pickedNumbers],
+  const xp = useQuery({
+    queryKey: ["draftXp", xpYear, pickedNumbers],
     enabled: pickedNumbers.length > 0,
     queryFn: ({ signal }) =>
       fetchApi<Record<string, number | null>>(
-        `/epa?teams=${pickedNumbers.join(",")}&year=${epaYear}`,
+        `/xp?teams=${pickedNumbers.join(",")}&year=${xpYear}`,
         signal,
       ),
     staleTime: 86400000,
@@ -97,7 +97,7 @@ export function DraftBoard({
                       <TeamCard
                         number={pick.team_picked}
                         events={pick.events ?? []}
-                        epa={epa.data?.[pick.team_picked]}
+                        xp={xp.data?.[pick.team_picked]}
                         year={year}
                         pickNumber={pickNumber}
                         hideEmptyWeeks={offseason}

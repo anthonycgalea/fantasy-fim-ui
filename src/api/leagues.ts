@@ -31,7 +31,7 @@ export type WaiverPriority = {
   fantasy_team_name: string;
   priority: number;
 };
-export type WaiverTeam = Omit<AvailableTeam, "year_end_epa"> & { year_end_epa?: number | null };
+export type WaiverTeam = Omit<AvailableTeam, "match13_xp"> & { match13_xp?: number | null };
 
 function useLeagueList<T>(leagueId: string, resource: string, key: string) {
   return useQuery({

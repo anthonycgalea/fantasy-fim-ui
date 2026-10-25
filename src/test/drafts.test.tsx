@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { DraftPage } from "@/components/drafts/DraftPage";
 import { DraftScores } from "@/components/drafts/DraftScores";
 import { buildDraftRows, countTeamWeeks } from "@/lib/draft-calculations";
-import { getEpaYear, parseRefreshInterval, type DraftPick } from "@/api/drafts";
+import { getXpYear, parseRefreshInterval, type DraftPick } from "@/api/drafts";
 import type { League } from "@/api/useLeagues";
 
 const { navigate } = vi.hoisted(() => ({ navigate: vi.fn() }));
@@ -65,22 +65,22 @@ const order = [
   { draft_slot: 2, fantasy_team_id: 20 },
 ];
 const available = [
-  { team_number: 1, name: "Low EPA", events: [{ week: 1, event_key: "a" }], year_end_epa: 5 },
+  { team_number: 1, name: "Low XP", events: [{ week: 1, event_key: "a" }], match13_xp: 5 },
   {
     team_number: 2,
-    name: "High EPA",
+    name: "High XP",
     events: [
       { week: 6, event_key: "2026micmp" },
       { week: 1, event_key: "2026miket" },
       { week: 1, event_key: "2026mike2" },
     ],
-    year_end_epa: 70,
+    match13_xp: 70,
   },
   {
     team_number: 3,
-    name: "Missing EPA",
+    name: "Missing XP",
     events: [{ week: 3, event_key: "c" }],
-    year_end_epa: null,
+    match13_xp: null,
   },
 ];
 function mockApi(offseason = false, overrides: Record<string, unknown> = {}) {
@@ -122,7 +122,7 @@ function mockApi(offseason = false, overrides: Record<string, unknown> = {}) {
   };
   Object.assign(data, overrides);
   const fetch = vi.fn(async (input: string) => {
-    if (input.startsWith("/api/epa?"))
+    if (input.startsWith("/api/xp?"))
       return { ok: true, json: async () => ({ "27": 90, "33": 80 }) };
     if (!(input in data)) throw new Error(`Unexpected API path: ${input}`);
     return { ok: true, json: async () => data[input] };
@@ -142,7 +142,7 @@ afterEach(() => {
 });
 
 describe("Draft flow", () => {
-  it("renders snake-order picks, empty slots, the active pick and API EPA", async () => {
+  it("renders snake-order picks, empty slots, the active pick and API XP", async () => {
     const fetch = mockApi();
     renderPage();
     expect(screen.getByRole("status")).toHaveTextContent("Loading draft information");
@@ -164,8 +164,8 @@ describe("Draft flow", () => {
     expect(cells[3]).toHaveTextContent("33");
     expect(cells[3]).toHaveTextContent("Weeks 5, 6");
     expect(cells[3]).not.toHaveTextContent("99");
-    await waitFor(() => expect(cells[0]).toHaveTextContent("EPA 90"));
-    expect(fetch).toHaveBeenCalledWith("/api/epa?teams=27,33&year=2026", expect.anything());
+    await waitFor(() => expect(cells[0]).toHaveTextContent("XP 90"));
+    expect(fetch).toHaveBeenCalledWith("/api/xp?teams=27,33&year=2026", expect.anything());
     expect(within(board).getByText("27").closest("a")).toHaveAttribute(
       "href",
       "https://www.thebluealliance.com/team/27/2026",
@@ -197,11 +197,54 @@ describe("Draft flow", () => {
     expect(screen.queryByText("Picking")).not.toBeInTheDocument();
   });
 
-  it("sorts available teams by EPA, filters weeks and searches by name", async () => {
+  it.each([
+    [0, "0"],
+    [null, "—"],
+  ] as const)("rounds picked-team XP and displays %s as %s", async (value, display) => {
+    const originalFetch = mockApi();
+    const fetch = vi.fn(async (input: string) => {
+      if (input.startsWith("/api/xp?"))
+        return { ok: true, json: async () => ({ "27": 2129.6, "33": value }) };
+      return originalFetch(input);
+    });
+    vi.stubGlobal("fetch", fetch);
+    renderPage();
+    const board = await screen.findByRole("region", { name: /Draft board, scroll/ });
+    await waitFor(() =>
+      expect(board.querySelector('[data-pick="1"]')).toHaveTextContent("XP 2130"),
+    );
+    expect(board.querySelector('[data-pick="3"]')).toHaveTextContent(`XP ${display}`);
+  });
+
+  it("ranks zero XP ahead of unavailable teams and rounds available-team XP", async () => {
+    mockApi(false, {
+      "/api/drafts/7/availableTeams": [
+        { ...available[2], match13_xp: null },
+        { ...available[0], match13_xp: 0 },
+        { ...available[1], match13_xp: 2129.6 },
+      ],
+    });
+    renderPage();
+    const section = await screen.findByRole("region", { name: "Available teams" });
+    await within(section).findByText("High XP");
+    const rows = within(section).getAllByRole("row").slice(1);
+    expect(rows.map((row) => row.querySelectorAll("td")[1]?.textContent)).toEqual([
+      "High XP",
+      "Low XP",
+      "Missing XP",
+    ]);
+    expect(rows.map((row) => row.querySelectorAll("td")[2]?.textContent)).toEqual([
+      "2130",
+      "0",
+      "—",
+    ]);
+  });
+
+  it("sorts available teams by XP, filters weeks and searches by name", async () => {
     mockApi();
     renderPage();
     const section = await screen.findByRole("region", { name: "Available teams" });
-    await within(section).findByText("High EPA");
+    await within(section).findByText("High XP");
     const table = within(section).getByRole("table");
     expect(
       within(table)
@@ -224,8 +267,8 @@ describe("Draft flow", () => {
         .getAllByRole("row")
         .slice(1)
         .map((row) => row.querySelectorAll("td")[1]?.textContent),
-    ).toEqual(["High EPA", "Low EPA", "Missing EPA"]);
-    const highRow = within(table).getByText("High EPA").closest("tr")!;
+    ).toEqual(["High XP", "Low XP", "Missing XP"]);
+    const highRow = within(table).getByText("High XP").closest("tr")!;
     expect(within(highRow).getAllByRole("cell")[2]).toHaveTextContent("70");
     expect(within(highRow).getByRole("link", { name: "micmp" })).toHaveAttribute(
       "href",
@@ -237,9 +280,9 @@ describe("Draft flow", () => {
     );
     expect(within(highRow).getByRole("link", { name: "mike2" })).toBeInTheDocument();
     fireEvent.click(within(section).getByRole("checkbox", { name: "Week 6" }));
-    expect(within(section).getByText("High EPA")).toBeInTheDocument();
+    expect(within(section).getByText("High XP")).toBeInTheDocument();
     fireEvent.click(within(section).getByRole("checkbox", { name: "Week 1" }));
-    expect(within(section).queryByText("High EPA")).not.toBeInTheDocument();
+    expect(within(section).queryByText("High XP")).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "missing" } });
     expect(within(section).getAllByRole("row")).toHaveLength(2);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "nothing" } });
@@ -271,7 +314,7 @@ describe("Draft flow", () => {
       "/drafts/7/scores",
     );
     expect(await screen.findByRole("heading", { name: "Draft board" })).toBeInTheDocument();
-    expect(await screen.findByText("High EPA")).toBeInTheDocument();
+    expect(await screen.findByText("High XP")).toBeInTheDocument();
     expect(
       within(screen.getByRole("region", { name: "Available teams" })).queryByRole("table"),
     ).not.toBeInTheDocument();
@@ -360,12 +403,12 @@ describe("Draft calculations", () => {
     expect(countTeamWeeks(20, picks)).toEqual([0, 0, 0, 0, 2]);
     expect(buildDraftRows([], [], 2)).toEqual([[], []]);
   });
-  it("uses the original EPA year rules", () => {
-    expect(getEpaYear(league)).toBe(2025);
-    expect(getEpaYear(league, { year: 2026, week: 1 })).toBe(2025);
-    expect(getEpaYear(league, { year: 2026, week: 2 })).toBe(2026);
-    expect(getEpaYear(league, { year: 2025, week: 3 })).toBe(2025);
-    expect(getEpaYear({ ...league, offseason: true })).toBe(2026);
+  it("uses the original XP year rules", () => {
+    expect(getXpYear(league)).toBe(2025);
+    expect(getXpYear(league, { year: 2026, week: 1 })).toBe(2025);
+    expect(getXpYear(league, { year: 2026, week: 2 })).toBe(2026);
+    expect(getXpYear(league, { year: 2025, week: 3 })).toBe(2025);
+    expect(getXpYear({ ...league, offseason: true })).toBe(2026);
   });
   it("rejects invalid refresh values", () => {
     for (const value of [undefined, false, true, "false", -1, 0, 200, "NaN", Infinity, [], {}])

@@ -15,7 +15,7 @@ export type AvailableTeam = {
   team_number: number;
   name: string;
   events: TeamEvent[];
-  year_end_epa: number | null;
+  match13_xp: number | null;
 };
 export type WeekStatus = { year: number; week: number };
 export type ScoreBreakdown = {
@@ -109,7 +109,7 @@ export function useDraftScores(draftId: string) {
   });
 }
 
-export function getEpaYear(league: League, currentWeek?: WeekStatus) {
+export function getXpYear(league: League, currentWeek?: WeekStatus) {
   if (league.offseason) return league.year;
   return currentWeek?.year === league.year && currentWeek.week !== 1
     ? league.year
