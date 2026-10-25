@@ -1,3 +1,4 @@
+import { apiUrl } from "./config";
 import { useQuery } from "@tanstack/react-query";
 
 export type League = {
@@ -13,12 +14,8 @@ export type League = {
 };
 
 export async function fetchLeagues(signal?: AbortSignal, year?: number): Promise<League[]> {
-  const baseUrl = (
-    import.meta.env["VITE_API_BASE_URL"] ??
-    (import.meta.env.DEV ? "/api" : "https://fantasyfim.com/api")
-  ).replace(/\/$/, "");
   const query = year === undefined ? "" : `?year=${year}`;
-  const response = await fetch(`${baseUrl}/leagues${query}`, { signal: signal ?? null });
+  const response = await fetch(apiUrl(`/leagues${query}`), { signal: signal ?? null });
   if (!response.ok) {
     throw new Error(`Unable to load leagues (${response.status})`);
   }

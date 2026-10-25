@@ -85,7 +85,7 @@ describe("Event data", () => {
     const middle = within(table).getByRole("rowheader", { name: "Middle District" }).closest("tr")!;
     expect(within(middle).getAllByRole("cell")[3]).toHaveTextContent("0");
     expect(fetch).toHaveBeenCalledWith(
-      "/api/eventData",
+      "https://api.fantasyfim.com/eventData",
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });

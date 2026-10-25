@@ -58,7 +58,7 @@ describe("API leagues", () => {
       screen.getAllByRole("listitem").map((item) => item.querySelector("h2")?.textContent),
     ).toEqual(["New Michigan League", "Michigan League"]);
     expect(fetch).toHaveBeenCalledWith(
-      "/api/leagues?year=2026",
+      "https://api.fantasyfim.com/leagues?year=2026",
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
@@ -88,7 +88,7 @@ describe("API leagues", () => {
     expect(await screen.findByText("2025 Michigan League")).toBeInTheDocument();
     expect(screen.queryByText("2026 Michigan League")).not.toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith(
-      "/api/leagues?year=2025",
+      "https://api.fantasyfim.com/leagues?year=2025",
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
     fireEvent.change(select, { target: { value: "2026" } });
@@ -153,7 +153,7 @@ describe("Offseason leagues", () => {
       return {
         ok: true,
         json: async () =>
-          url === "/api/leagues?year=2026"
+          url === "https://api.fantasyfim.com/leagues?year=2026"
             ? leagues
             : [
                 { draft_id: id * 10 + 1, league_id: id, event_key: `2026second${id}`, rounds: 3 },
@@ -174,8 +174,14 @@ describe("Offseason leagues", () => {
     expect(card).toHaveAttribute("href", "/drafts/421");
     expect(card).toContainElement(screen.getByRole("heading", { name: "Latest offseason" }));
     expect(screen.getAllByRole("link")).toHaveLength(3);
-    expect(fetch).toHaveBeenCalledWith("/api/leagues/42/drafts", expect.anything());
-    expect(fetch).not.toHaveBeenCalledWith("/api/leagues/100/drafts", expect.anything());
+    expect(fetch).toHaveBeenCalledWith(
+      "https://api.fantasyfim.com/leagues/42/drafts",
+      expect.anything(),
+    );
+    expect(fetch).not.toHaveBeenCalledWith(
+      "https://api.fantasyfim.com/leagues/100/drafts",
+      expect.anything(),
+    );
     expect(screen.queryByRole("link", { name: /View league/ })).not.toBeInTheDocument();
     expect(screen.queryByText("Regular league")).not.toBeInTheDocument();
     expect(leagues.map((league) => league.league_id)).toEqual([9, 100, 42, 20]);
@@ -185,7 +191,7 @@ describe("Offseason leagues", () => {
     const fetch = vi.fn(async (url: string) => ({
       ok: true,
       json: async () =>
-        url.startsWith("/api/leagues?year=")
+        url.startsWith("https://api.fantasyfim.com/leagues?year=")
           ? [
               {
                 league_id: url.endsWith("2025") ? 25 : 26,
@@ -215,8 +221,14 @@ describe("Offseason leagues", () => {
       "/drafts/250",
     );
     expect(screen.queryByRole("link", { name: /2026 Offseason/ })).not.toBeInTheDocument();
-    expect(fetch).toHaveBeenCalledWith("/api/leagues?year=2025", expect.anything());
-    expect(fetch).toHaveBeenCalledWith("/api/leagues/25/drafts", expect.anything());
+    expect(fetch).toHaveBeenCalledWith(
+      "https://api.fantasyfim.com/leagues?year=2025",
+      expect.anything(),
+    );
+    expect(fetch).toHaveBeenCalledWith(
+      "https://api.fantasyfim.com/leagues/25/drafts",
+      expect.anything(),
+    );
   });
 
   it("only looks up links when their cards approach the viewport", async () => {
@@ -234,7 +246,7 @@ describe("Offseason leagues", () => {
     const fetch = vi.fn(async (url: string) => ({
       ok: true,
       json: async () =>
-        url === "/api/leagues?year=2026"
+        url === "https://api.fantasyfim.com/leagues?year=2026"
           ? [
               {
                 league_id: 2,
@@ -268,7 +280,10 @@ describe("Offseason leagues", () => {
       "href",
       "/drafts/20",
     );
-    expect(fetch).not.toHaveBeenCalledWith("/api/leagues/1/drafts", expect.anything());
+    expect(fetch).not.toHaveBeenCalledWith(
+      "https://api.fantasyfim.com/leagues/1/drafts",
+      expect.anything(),
+    );
     act(() => intersections.get(secondCard)!(true));
     expect(await screen.findByRole("link", { name: /Earlier offseason/ })).toHaveAttribute(
       "href",
@@ -282,7 +297,7 @@ describe("Offseason leagues", () => {
       vi.fn(async (url: string) => ({
         ok: true,
         json: async () =>
-          url === "/api/leagues?year=2026"
+          url === "https://api.fantasyfim.com/leagues?year=2026"
             ? [
                 {
                   league_id: 1,
@@ -299,7 +314,7 @@ describe("Offseason leagues", () => {
                   year: 2026,
                 },
               ]
-            : url === "/api/leagues/1/drafts"
+            : url === "https://api.fantasyfim.com/leagues/1/drafts"
               ? []
               : [{ draft_id: 7, league_id: 2, event_key: "2026ready", rounds: 2 }],
       })),
@@ -318,7 +333,7 @@ describe("Offseason leagues", () => {
       vi.fn(async (url: string) => ({
         ok: true,
         json: async () =>
-          url === "/api/leagues?year=2026"
+          url === "https://api.fantasyfim.com/leagues?year=2026"
             ? [
                 {
                   league_id: 1,
@@ -340,14 +355,14 @@ describe("Offseason leagues", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string) => {
-        if (url === "/api/leagues/2/drafts" && !failed) {
+        if (url === "https://api.fantasyfim.com/leagues/2/drafts" && !failed) {
           failed = true;
           return { ok: false, status: 503 };
         }
         return {
           ok: true,
           json: async () =>
-            url === "/api/leagues?year=2026"
+            url === "https://api.fantasyfim.com/leagues?year=2026"
               ? [
                   {
                     league_id: 1,

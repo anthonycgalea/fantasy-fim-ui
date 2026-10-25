@@ -1,3 +1,4 @@
+import { apiUrl } from "./config";
 import { useQuery } from "@tanstack/react-query";
 import type { League } from "./useLeagues";
 
@@ -36,11 +37,7 @@ export type DraftScore = {
 };
 
 export async function fetchApi<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const base = (
-    import.meta.env["VITE_API_BASE_URL"] ??
-    (import.meta.env.DEV ? "/api" : "https://fantasyfim.com/api")
-  ).replace(/\/$/, "");
-  const response = await fetch(`${base}${path}`, { signal: signal ?? null });
+  const response = await fetch(apiUrl(path), { signal: signal ?? null });
   if (!response.ok) throw new Error(`Request failed (${response.status})`);
   return response.json() as Promise<T>;
 }

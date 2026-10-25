@@ -1,3 +1,4 @@
+import { apiUrl } from "@/api/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -138,7 +139,7 @@ function NavigationItems({ onNavigate }: { onNavigate?: () => void }) {
         </Link>
       ))}
       <a
-        href="https://fantasyfim.com/api/apidocs"
+        href={apiUrl("/apidocs/")}
         onClick={onNavigate}
         className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
       >

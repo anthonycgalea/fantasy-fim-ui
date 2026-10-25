@@ -29,18 +29,22 @@ The first visit follows your system preference; your choice is saved in this bro
 
 Run development commands from the repository root. Open http://localhost:3000 after Vite reports it is ready.
 
-## League API
+## API configuration
 
-The Leagues page reuses the original frontend’s `GET /api/leagues` contract
-and displays entries where `is_fim` is true.
+All frontend API requests default to `https://api.fantasyfim.com`, in development
+and production, without an `/api` path prefix. For example, leagues load from
+`https://api.fantasyfim.com/leagues?year=2026`.
 
-Production requests default to `https://fantasyfim.com/api`.
-In development, requests use `/api` on the UI’s origin, and Vite proxies
-these requests to `https://fantasyfim.com` (preserving `/api/leagues`). Set
-`API_PROXY_TARGET` to another backend origin when needed.
+The shared URL helper is `src/api/config.ts`. Override the API origin with
+`VITE_API_BASE_URL` in `.env.local` during development or in the build environment:
 
-For a separately hosted API, set `VITE_API_BASE_URL` to its full API base URL
-(including `/api`) before building. That API must allow the UI origin via CORS.
-For same-origin production hosting, set `VITE_API_BASE_URL=/api` and route
-`/api/*` to the backend in your reverse
-proxy; the Vite development proxy does not run in production.
+```sh
+VITE_API_BASE_URL=https://api.fantasyfim.com
+```
+
+Restart the dev server or rebuild after changing this value. Use an origin without
+an `/api` suffix. Requests go directly to that origin; no development API proxy is
+needed. The API must allow the frontend origin via CORS.
+
+API docs: https://api.fantasyfim.com/apidocs/.
+Team avatars and event links continue to use The Blue Alliance.

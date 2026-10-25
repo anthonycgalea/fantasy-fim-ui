@@ -65,9 +65,11 @@ const breakdown = {
 };
 function mockApi(overrides: Record<string, unknown> = {}, failures: Record<string, number> = {}) {
   const data: Record<string, unknown> = {
-    "/api/leagues/2": league,
-    "/api/leagues/2/drafts": [{ draft_id: 7, event_key: "2026test", rounds: 2, league_id: 2 }],
-    "/api/leagues/2/rankings": [
+    "https://api.fantasyfim.com/leagues/2": league,
+    "https://api.fantasyfim.com/leagues/2/drafts": [
+      { draft_id: 7, event_key: "2026test", rounds: 2, league_id: 2 },
+    ],
+    "https://api.fantasyfim.com/leagues/2/rankings": [
       {
         fantasy_team_id: 20,
         fantasy_team_name: "Bravo",
@@ -76,9 +78,9 @@ function mockApi(overrides: Record<string, unknown> = {}, failures: Record<strin
       },
       { fantasy_team_id: 10, fantasy_team_name: "Alpha", total_ranking_points: 8, tiebreaker: 350 },
     ],
-    "/api/currentWeek": { year: 2026, week: 2 },
-    "/api/leagues/2/fantasyTeams": teams,
-    "/api/leagues/2/lineups": [1, 2].map((week) => ({
+    "https://api.fantasyfim.com/currentWeek": { year: 2026, week: 2 },
+    "https://api.fantasyfim.com/leagues/2/fantasyTeams": teams,
+    "https://api.fantasyfim.com/leagues/2/lineups": [1, 2].map((week) => ({
       week,
       fantasy_teams: [
         {
@@ -89,7 +91,7 @@ function mockApi(overrides: Record<string, unknown> = {}, failures: Record<strin
         { fantasy_team_id: 20, fantasy_team_name: "Bravo", teams: [{ team_number: "67" }] },
       ],
     })),
-    "/api/leagues/2/fantasyScores/1": [
+    "https://api.fantasyfim.com/leagues/2/fantasyScores/1": [
       {
         fantasy_team_id: 10,
         fantasy_team_name: "Alpha",
@@ -98,7 +100,7 @@ function mockApi(overrides: Record<string, unknown> = {}, failures: Record<strin
         teams: [{ team_number: "27", weekly_score: 50, breakdown }],
       },
     ],
-    "/api/leagues/2/fantasyScores/2": [
+    "https://api.fantasyfim.com/leagues/2/fantasyScores/2": [
       {
         fantasy_team_id: 10,
         fantasy_team_name: "Alpha",
@@ -110,11 +112,11 @@ function mockApi(overrides: Record<string, unknown> = {}, failures: Record<strin
         ],
       },
     ],
-    "/api/leagues/2/rosters": [
+    "https://api.fantasyfim.com/leagues/2/rosters": [
       { fantasy_team_id: 10, fantasy_team_name: "Alpha", roster: ["frc27", "33"] },
       { fantasy_team_id: 20, fantasy_team_name: "Bravo", roster: [] },
     ],
-    "/api/leagues/2/rosterWeeks": [
+    "https://api.fantasyfim.com/leagues/2/rosterWeeks": [
       {
         fantasy_team_id: 10,
         fantasy_team_name: "Alpha",
@@ -130,9 +132,9 @@ function mockApi(overrides: Record<string, unknown> = {}, failures: Record<strin
         ],
       },
     ],
-    "/api/leagues/2/availableTeams": pool,
-    "/api/leagues/2/teamsOnWaivers": pool,
-    "/api/leagues/2/waiverPriority": [
+    "https://api.fantasyfim.com/leagues/2/availableTeams": pool,
+    "https://api.fantasyfim.com/leagues/2/teamsOnWaivers": pool,
+    "https://api.fantasyfim.com/leagues/2/waiverPriority": [
       { fantasy_team_id: 20, fantasy_team_name: "Bravo", priority: 1 },
       { fantasy_team_id: 10, fantasy_team_name: "Alpha", priority: 2 },
     ],
@@ -198,21 +200,21 @@ describe("League pages", () => {
     );
     expect(select).toHaveValue("1");
     expect(fetch).toHaveBeenCalledWith(
-      "/api/leagues/2/fantasyScores/1",
+      "https://api.fantasyfim.com/leagues/2/fantasyScores/1",
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 
   it("uses the first available week when the current week is from another year", async () => {
-    mockApi({ "/api/currentWeek": { year: 2025, week: 2 } });
+    mockApi({ "https://api.fantasyfim.com/currentWeek": { year: 2025, week: 2 } });
     renderPage(<LeagueScores leagueId="2" />);
     expect(await screen.findByRole("combobox", { name: "Week" })).toHaveValue("1");
   });
 
   it("keeps lineups visible when score requests fail and allows retry", async () => {
     mockApi(
-      { "/api/currentWeek": { year: 2025, week: 1 } },
-      { "/api/leagues/2/fantasyScores/1": 1 },
+      { "https://api.fantasyfim.com/currentWeek": { year: 2025, week: 1 } },
+      { "https://api.fantasyfim.com/leagues/2/fantasyScores/1": 1 },
     );
     renderPage(<LeagueScores leagueId="2" />);
     expect(await screen.findByRole("alert")).toHaveTextContent("Lineups are shown below");
@@ -256,13 +258,20 @@ describe("League pages", () => {
     async (waiver) => {
       const missingXpPool = pool.map(({ match13_xp: _xp, ...team }) => team);
       const fetch = mockApi({
-        "/api/leagues/2/availableTeams": missingXpPool,
-        "/api/leagues/2/teamsOnWaivers": missingXpPool,
-        "/api/xp?teams=27,33,67&year=2026": { "27": 0, "33": 2129.6, "67": null },
+        "https://api.fantasyfim.com/leagues/2/availableTeams": missingXpPool,
+        "https://api.fantasyfim.com/leagues/2/teamsOnWaivers": missingXpPool,
+        "https://api.fantasyfim.com/xp?teams=27,33,67&year=2026": {
+          "27": 0,
+          "33": 2129.6,
+          "67": null,
+        },
       });
       renderPage(<LeagueTeamPool leagueId="2" waiver={waiver} />);
       await screen.findByText("2130");
-      expect(fetch).toHaveBeenCalledWith("/api/xp?teams=27,33,67&year=2026", expect.anything());
+      expect(fetch).toHaveBeenCalledWith(
+        "https://api.fantasyfim.com/xp?teams=27,33,67&year=2026",
+        expect.anything(),
+      );
       expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual([
         expect.stringContaining("High XP"),
         expect.stringContaining("Low XP"),
@@ -296,8 +305,8 @@ describe("League pages", () => {
 
   it("shows non-FiM teams without week filtering", async () => {
     mockApi({
-      "/api/leagues/2": { ...league, is_fim: false, offseason: true },
-      "/api/leagues/2/availableTeams": [
+      "https://api.fantasyfim.com/leagues/2": { ...league, is_fim: false, offseason: true },
+      "https://api.fantasyfim.com/leagues/2/availableTeams": [
         { ...pool[0], events: [{ event_key: "offseason", week: 99 }] },
       ],
     });
@@ -316,7 +325,10 @@ describe("League pages", () => {
     const table = await screen.findByRole("table");
     const rows = within(table).getAllByRole("row").slice(1);
     expect(rows[0]).toHaveTextContent("1Bravo");
-    expect(fetch).toHaveBeenCalledWith("/api/leagues/2/waiverPriority", expect.anything());
+    expect(fetch).toHaveBeenCalledWith(
+      "https://api.fantasyfim.com/leagues/2/waiverPriority",
+      expect.anything(),
+    );
     fireEvent.click(screen.getByRole("button", { name: "Teams on Waivers" }));
     expect(await screen.findByRole("region", { name: "Teams on waivers" })).toBeInTheDocument();
   });
@@ -340,7 +352,9 @@ describe("League pages", () => {
   });
 
   it("links offseason leagues to their draft selection", async () => {
-    mockApi({ "/api/leagues/2": { ...league, is_fim: false, offseason: true } });
+    mockApi({
+      "https://api.fantasyfim.com/leagues/2": { ...league, is_fim: false, offseason: true },
+    });
     renderPage(<LeagueLayout leagueId="2" />);
     expect(await screen.findByRole("link", { name: "Drafts" })).toHaveAttribute(
       "href",
@@ -362,7 +376,7 @@ describe("League pages", () => {
   });
 
   it("retries a failed rankings request", async () => {
-    mockApi({}, { "/api/leagues/2/rankings": 1 });
+    mockApi({}, { "https://api.fantasyfim.com/leagues/2/rankings": 1 });
     renderPage(<Rankings leagueId="2" />);
     expect(await screen.findByRole("alert")).toHaveTextContent("Rankings couldn’t be loaded");
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
@@ -372,31 +386,31 @@ describe("League pages", () => {
   it.each([
     [
       "rankings",
-      "/api/leagues/2/rankings",
+      "https://api.fantasyfim.com/leagues/2/rankings",
       <Rankings leagueId="2" />,
       "Rankings aren’t available for this league yet.",
     ],
     [
       "lineups",
-      "/api/leagues/2/lineups",
+      "https://api.fantasyfim.com/leagues/2/lineups",
       <LeagueScores leagueId="2" />,
       "No lineups have been submitted for this league yet.",
     ],
     [
       "rosters",
-      "/api/leagues/2/rosters",
+      "https://api.fantasyfim.com/leagues/2/rosters",
       <LeagueRosters leagueId="2" />,
       "No rosters are available for this league yet.",
     ],
     [
       "available teams",
-      "/api/leagues/2/availableTeams",
+      "https://api.fantasyfim.com/leagues/2/availableTeams",
       <LeagueTeamPool leagueId="2" />,
       "No teams are available in this league.",
     ],
     [
       "waivers",
-      "/api/leagues/2/teamsOnWaivers",
+      "https://api.fantasyfim.com/leagues/2/teamsOnWaivers",
       <LeagueWaivers leagueId="2" />,
       "No teams are on waivers.",
     ],

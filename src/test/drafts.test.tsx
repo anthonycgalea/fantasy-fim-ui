@@ -85,19 +85,26 @@ const available = [
 ];
 function mockApi(offseason = false, overrides: Record<string, unknown> = {}) {
   const data: Record<string, unknown> = {
-    "/api/drafts/7": { draft_id: 7, league_id: 2, event_key: "2026test", rounds: 2 },
-    "/api/leagues/2": { ...league, offseason, is_fim: !offseason },
-    "/api/drafts/7/picks": offseason ? picks.map((pick) => ({ ...pick, events: [] })) : picks,
-    "/api/drafts/7/draftOrder": [...order].reverse(),
-    "/api/leagues/2/fantasyTeams": [
+    "https://api.fantasyfim.com/drafts/7": {
+      draft_id: 7,
+      league_id: 2,
+      event_key: "2026test",
+      rounds: 2,
+    },
+    "https://api.fantasyfim.com/leagues/2": { ...league, offseason, is_fim: !offseason },
+    "https://api.fantasyfim.com/drafts/7/picks": offseason
+      ? picks.map((pick) => ({ ...pick, events: [] }))
+      : picks,
+    "https://api.fantasyfim.com/drafts/7/draftOrder": [...order].reverse(),
+    "https://api.fantasyfim.com/leagues/2/fantasyTeams": [
       { fantasy_team_id: 10, team_name: "Alpha" },
       { fantasy_team_id: 20, team_name: "Bravo" },
     ],
-    "/api/currentWeek": { year: 2026, week: 2 },
-    "/api/drafts/7/availableTeams": offseason
+    "https://api.fantasyfim.com/currentWeek": { year: 2026, week: 2 },
+    "https://api.fantasyfim.com/drafts/7/availableTeams": offseason
       ? available.map((team) => ({ ...team, events: [] }))
       : available,
-    "/api/drafts/7/fantasyScores": [
+    "https://api.fantasyfim.com/drafts/7/fantasyScores": [
       {
         fantasy_team_id: 10,
         fantasy_team_name: "Alpha",
@@ -122,7 +129,7 @@ function mockApi(offseason = false, overrides: Record<string, unknown> = {}) {
   };
   Object.assign(data, overrides);
   const fetch = vi.fn(async (input: string) => {
-    if (input.startsWith("/api/xp?"))
+    if (input.startsWith("https://api.fantasyfim.com/xp?"))
       return { ok: true, json: async () => ({ "27": 90, "33": 80 }) };
     if (!(input in data)) throw new Error(`Unexpected API path: ${input}`);
     return { ok: true, json: async () => data[input] };
@@ -165,7 +172,10 @@ describe("Draft flow", () => {
     expect(cells[3]).toHaveTextContent("Weeks 5, 6");
     expect(cells[3]).not.toHaveTextContent("99");
     await waitFor(() => expect(cells[0]).toHaveTextContent("XP 90"));
-    expect(fetch).toHaveBeenCalledWith("/api/xp?teams=27,33&year=2026", expect.anything());
+    expect(fetch).toHaveBeenCalledWith(
+      "https://api.fantasyfim.com/xp?teams=27,33&year=2026",
+      expect.anything(),
+    );
     expect(within(board).getByText("27").closest("a")).toHaveAttribute(
       "href",
       "https://www.thebluealliance.com/team/27/2026",
@@ -178,7 +188,7 @@ describe("Draft flow", () => {
 
   it("advances the active pick to the lowest unpicked number and clears it when complete", async () => {
     mockApi(true, {
-      "/api/drafts/7/picks": picks.map((pick) =>
+      "https://api.fantasyfim.com/drafts/7/picks": picks.map((pick) =>
         pick.pick_number === 2 ? { ...pick, team_picked: "1" } : pick,
       ),
     });
@@ -187,7 +197,7 @@ describe("Draft flow", () => {
     expect(board.querySelector('[data-pick="4"]')).toHaveTextContent("Picking");
     cleanup();
     mockApi(true, {
-      "/api/drafts/7/picks": [
+      "https://api.fantasyfim.com/drafts/7/picks": [
         ...picks.map((pick) => (pick.pick_number === 2 ? { ...pick, team_picked: "1" } : pick)),
         { pick_number: 4, fantasy_team_id: 10, team_picked: "2", events: [] },
       ],
@@ -203,7 +213,7 @@ describe("Draft flow", () => {
   ] as const)("rounds picked-team XP and displays %s as %s", async (value, display) => {
     const originalFetch = mockApi();
     const fetch = vi.fn(async (input: string) => {
-      if (input.startsWith("/api/xp?"))
+      if (input.startsWith("https://api.fantasyfim.com/xp?"))
         return { ok: true, json: async () => ({ "27": 2129.6, "33": value }) };
       return originalFetch(input);
     });
@@ -218,7 +228,7 @@ describe("Draft flow", () => {
 
   it("ranks zero XP ahead of unavailable teams and rounds available-team XP", async () => {
     mockApi(false, {
-      "/api/drafts/7/availableTeams": [
+      "https://api.fantasyfim.com/drafts/7/availableTeams": [
         { ...available[2], match13_xp: null },
         { ...available[0], match13_xp: 0 },
         { ...available[1], match13_xp: 2129.6 },
@@ -244,10 +254,12 @@ describe("Draft flow", () => {
     "loads and sorts XP omitted by the available-team response (offseason: %s)",
     async (offseason) => {
       const originalFetch = mockApi(offseason, {
-        "/api/drafts/7/availableTeams": available.map(({ match13_xp: _xp, ...team }) => team),
+        "https://api.fantasyfim.com/drafts/7/availableTeams": available.map(
+          ({ match13_xp: _xp, ...team }) => team,
+        ),
       });
       const fetch = vi.fn(async (url: string) =>
-        url === "/api/xp?teams=1,2,3&year=2026"
+        url === "https://api.fantasyfim.com/xp?teams=1,2,3&year=2026"
           ? { ok: true, json: async () => ({ "1": 0, "2": 2129.6, "3": null }) }
           : originalFetch(url),
       );
@@ -255,7 +267,10 @@ describe("Draft flow", () => {
       renderPage();
       const section = await screen.findByRole("region", { name: "Available teams" });
       await waitFor(() => expect(within(section).getByText("2130")).toBeInTheDocument());
-      expect(fetch).toHaveBeenCalledWith("/api/xp?teams=1,2,3&year=2026", expect.anything());
+      expect(fetch).toHaveBeenCalledWith(
+        "https://api.fantasyfim.com/xp?teams=1,2,3&year=2026",
+        expect.anything(),
+      );
       expect(within(section).getByText("0")).toBeInTheDocument();
       expect(within(section).getAllByText("—").length).toBeGreaterThan(0);
       const names = offseason
@@ -360,9 +375,9 @@ describe("Draft flow", () => {
 
   it("handles a draft with no order or available teams", async () => {
     mockApi(false, {
-      "/api/drafts/7/draftOrder": [],
-      "/api/drafts/7/picks": [],
-      "/api/drafts/7/availableTeams": [],
+      "https://api.fantasyfim.com/drafts/7/draftOrder": [],
+      "https://api.fantasyfim.com/drafts/7/picks": [],
+      "https://api.fantasyfim.com/drafts/7/availableTeams": [],
     });
     renderPage();
     expect(await screen.findByText("The draft order hasn’t been set yet.")).toBeInTheDocument();
@@ -370,7 +385,7 @@ describe("Draft flow", () => {
   });
 
   it("shows an empty state when scores are not available", async () => {
-    mockApi(true, { "/api/drafts/7/fantasyScores": [] });
+    mockApi(true, { "https://api.fantasyfim.com/drafts/7/fantasyScores": [] });
     renderPage(<DraftScores draftId="7" />);
     expect(
       await screen.findByText("Scores aren’t available for this draft yet."),
