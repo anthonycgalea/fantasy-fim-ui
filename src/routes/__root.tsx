@@ -9,7 +9,10 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { themeScript } from "../lib/theme";
 
@@ -120,7 +123,46 @@ const nav = [
   { to: "/eventData", label: "Events" },
 ] as const;
 
+function NavigationItems({ onNavigate }: { onNavigate?: () => void }) {
+  return (
+    <>
+      {nav.map((n) => (
+        <Link
+          key={n.to}
+          to={n.to}
+          onClick={onNavigate}
+          className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+          activeProps={{ className: "bg-accent text-accent-foreground" }}
+        >
+          {n.label}
+        </Link>
+      ))}
+      <a
+        href="https://fantasyfim.com/api/apidocs"
+        onClick={onNavigate}
+        className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+      >
+        API
+      </a>
+      <a
+        href="https://github.com/anthonycgalea/fantasy-fim"
+        onClick={onNavigate}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+      >
+        GitHub
+      </a>
+      <ThemeToggle />
+      <button className="ml-3 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
+        Sign in
+      </button>
+    </>
+  );
+}
+
 function RootComponent() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { queryClient } = Route.useRouteContext();
   const isDraftPage = useRouterState({
     select: (state) => state.location.pathname.startsWith("/drafts/"),
@@ -137,36 +179,32 @@ function RootComponent() {
               </span>
               Fantasy <span className="text-primary">FiM</span>
             </Link>
-            <nav aria-label="Main navigation" className="flex flex-wrap items-center gap-1">
-              {nav.map((n) => (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-                  activeProps={{ className: "bg-accent text-accent-foreground" }}
-                >
-                  {n.label}
-                </Link>
-              ))}
-              <a
-                href="https://fantasyfim.com/api/apidocs"
-                className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-              >
-                API
-              </a>
-              <a
-                href="https://github.com/anthonycgalea/fantasy-fim"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-              >
-                GitHub
-              </a>
-              <ThemeToggle />
-              <button className="ml-3 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
-                Sign in
-              </button>
+            <nav
+              aria-label="Main navigation"
+              className="hidden flex-wrap items-center gap-1 md:flex"
+            >
+              <NavigationItems />
             </nav>
+            <Popover open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="md:hidden"
+                  aria-label="Navigation menu"
+                >
+                  <Menu className="h-5 w-5" aria-hidden="true" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-64 max-w-[calc(100vw-2rem)] md:hidden">
+                <nav
+                  aria-label="Mobile navigation"
+                  className="flex flex-col gap-1 [&>a]:w-full [&>a]:rounded-lg [&>button]:ml-0 [&>button]:w-full"
+                >
+                  <NavigationItems onNavigate={() => setMobileMenuOpen(false)} />
+                </nav>
+              </PopoverContent>
+            </Popover>
           </div>
         </header>
         <main
