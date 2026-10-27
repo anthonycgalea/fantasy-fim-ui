@@ -100,7 +100,7 @@ function mockApi(offseason = false, overrides: Record<string, unknown> = {}) {
       { fantasy_team_id: 10, team_name: "Alpha" },
       { fantasy_team_id: 20, team_name: "Bravo" },
     ],
-    "https://api.fantasyfim.com/currentWeek": { year: 2026, week: 2 },
+    "https://api.fantasyfim.com/currentWeek?year=2026": { year: 2026, week: 2 },
     "https://api.fantasyfim.com/drafts/7/availableTeams": offseason
       ? available.map((team) => ({ ...team, events: [] }))
       : available,

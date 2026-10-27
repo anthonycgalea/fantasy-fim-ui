@@ -36,9 +36,15 @@ export type DraftScore = {
   teams: TeamScore[];
 };
 
+export class ApiError extends Error {
+  constructor(public status: number) {
+    super(`Request failed (${status})`);
+  }
+}
+
 export async function fetchApi<T>(path: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(apiUrl(path), { signal: signal ?? null });
-  if (!response.ok) throw new Error(`Request failed (${response.status})`);
+  if (!response.ok) throw new ApiError(response.status);
   return response.json() as Promise<T>;
 }
 
@@ -92,10 +98,23 @@ export function useAvailableTeams(draftId: string, interval: number | false = fa
     refetchInterval: interval,
   });
 }
-export function useCurrentWeek() {
+export function useCurrentWeek(year: number | undefined) {
   return useQuery({
-    queryKey: ["currentWeek"],
-    queryFn: ({ signal }) => fetchApi<WeekStatus>("/currentWeek", signal),
+    queryKey: ["currentWeek", year],
+    enabled: year !== undefined,
+    queryFn: async ({ signal }) => {
+      try {
+        return await fetchApi<WeekStatus>(
+          `/currentWeek?year=${encodeURIComponent(String(year))}`,
+          signal,
+        );
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 404) return null;
+        throw error;
+      }
+    },
+    retry: (failureCount, error) =>
+      !(error instanceof ApiError && error.status === 400) && failureCount < 3,
   });
 }
 export function useDraftScores(draftId: string) {
@@ -106,7 +125,7 @@ export function useDraftScores(draftId: string) {
   });
 }
 
-export function getXpYear(league: League, currentWeek?: WeekStatus) {
+export function getXpYear(league: League, currentWeek?: WeekStatus | null) {
   if (league.offseason) return league.year;
   return currentWeek?.year === league.year && currentWeek.week !== 1
     ? league.year

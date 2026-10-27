@@ -8,7 +8,7 @@ import { ErrorPanel, LoadingPanel } from "@/components/drafts/QueryPanel";
 export function LeagueScores({ leagueId }: { leagueId: string }) {
   const lineups = useLineups(leagueId);
   const league = useLeague(Number(leagueId));
-  const currentWeek = useCurrentWeek();
+  const currentWeek = useCurrentWeek(league.data?.year);
   const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
   const weeks = [...new Set(lineups.data?.map((lineup) => lineup.week) ?? [])].sort(
     (a, b) => a - b,
@@ -20,7 +20,7 @@ export function LeagueScores({ leagueId }: { leagueId: string }) {
   const activeWeek =
     selectedWeek !== null && weeks.includes(selectedWeek) ? selectedWeek : defaultWeek;
   const scores = useLeagueScores(leagueId, activeWeek);
-  const queries = [lineups, league];
+  const queries = [lineups, league, currentWeek];
   if (queries.some((query) => query.isError))
     return (
       <ErrorPanel
@@ -32,7 +32,8 @@ export function LeagueScores({ leagueId }: { leagueId: string }) {
         }}
       />
     );
-  if (!lineups.data || !league.data) return <LoadingPanel label="Loading scores and lineups…" />;
+  if (!lineups.data || !league.data || currentWeek.isPending)
+    return <LoadingPanel label="Loading scores and lineups…" />;
   if (!weeks.length)
     return <EmptyPanel label="No lineups have been submitted for this league yet." />;
   const weekLineup = lineups.data.find((lineup) => lineup.week === activeWeek);

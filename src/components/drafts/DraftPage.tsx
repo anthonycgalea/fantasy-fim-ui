@@ -33,8 +33,8 @@ export function DraftPage({
   const picks = useDraftPicks(draftId, interval);
   const order = useDraftOrder(draftId);
   const teams = useFantasyTeams(draft.data?.league_id);
-  const currentWeek = useCurrentWeek();
-  const headerQueries = [draft, league];
+  const currentWeek = useCurrentWeek(league.data?.year);
+  const headerQueries = [draft, league, currentWeek];
   if (headerQueries.some((query) => query.isError))
     return (
       <ErrorPanel
@@ -46,7 +46,8 @@ export function DraftPage({
         }}
       />
     );
-  if (!draft.data || !league.data) return <LoadingPanel label="Loading draft information…" />;
+  if (!draft.data || !league.data || currentWeek.isPending)
+    return <LoadingPanel label="Loading draft information…" />;
   const activeTab = league.data.offseason ? "draft" : tab;
   const boardQueries = [picks, teams, ...(activeTab === "draft" ? [order] : [])];
   const xpYear = getXpYear(league.data, currentWeek.data);

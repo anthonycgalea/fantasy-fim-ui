@@ -17,13 +17,14 @@ export function LeagueTeamPool({
 }) {
   const league = useLeague(Number(leagueId));
   const pool = useLeagueTeamPool(leagueId, waiver);
-  const currentWeek = useCurrentWeek();
-  const xpYear = league.data ? getXpYear(league.data, currentWeek.data) : undefined;
+  const currentWeek = useCurrentWeek(league.data?.year);
+  const xpYear =
+    league.data && currentWeek.isSuccess ? getXpYear(league.data, currentWeek.data) : undefined;
   const poolXp = useTeamPoolXp(pool.data, xpYear);
   const [selectedWeeks, setSelectedWeeks] = useState(weekOptions);
   const [search, setSearch] = useState("");
   const title = waiver ? "Teams on waivers" : "Available teams";
-  const queries = [league, pool];
+  const queries = [league, pool, currentWeek];
   if (queries.some((query) => query.isError))
     return (
       <ErrorPanel
@@ -35,7 +36,8 @@ export function LeagueTeamPool({
         }}
       />
     );
-  if (!league.data || !pool.data) return <LoadingPanel label={`Loading ${title.toLowerCase()}…`} />;
+  if (!league.data || !pool.data || currentWeek.isPending)
+    return <LoadingPanel label={`Loading ${title.toLowerCase()}…`} />;
   const teams = [...poolXp.teams]
     .sort((a, b) => compareXpDescending(a.match13_xp, b.match13_xp))
     .filter(

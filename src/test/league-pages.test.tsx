@@ -78,7 +78,7 @@ function mockApi(overrides: Record<string, unknown> = {}, failures: Record<strin
       },
       { fantasy_team_id: 10, fantasy_team_name: "Alpha", total_ranking_points: 8, tiebreaker: 350 },
     ],
-    "https://api.fantasyfim.com/currentWeek": { year: 2026, week: 2 },
+    "https://api.fantasyfim.com/currentWeek?year=2026": { year: 2026, week: 2 },
     "https://api.fantasyfim.com/leagues/2/fantasyTeams": teams,
     "https://api.fantasyfim.com/leagues/2/lineups": [1, 2].map((week) => ({
       week,
@@ -205,15 +205,39 @@ describe("League pages", () => {
     );
   });
 
+  it("uses the first available week when the league year has no active week", async () => {
+    const originalFetch = mockApi();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) =>
+        url.endsWith("/currentWeek?year=2026") ? { ok: false, status: 404 } : originalFetch(url),
+      ),
+    );
+    renderPage(<LeagueScores leagueId="2" />);
+    expect(await screen.findByRole("combobox", { name: "Week" })).toHaveValue("1");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("shows an error for an invalid current-week year", async () => {
+    const originalFetch = mockApi();
+    const fetch = vi.fn(async (url: string) =>
+      url.endsWith("/currentWeek?year=2026") ? { ok: false, status: 400 } : originalFetch(url),
+    );
+    vi.stubGlobal("fetch", fetch);
+    renderPage(<LeagueScores leagueId="2" />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("couldn’t be loaded");
+    expect(fetch.mock.calls.filter(([url]) => url.includes("/currentWeek"))).toHaveLength(1);
+  });
+
   it("uses the first available week when the current week is from another year", async () => {
-    mockApi({ "https://api.fantasyfim.com/currentWeek": { year: 2025, week: 2 } });
+    mockApi({ "https://api.fantasyfim.com/currentWeek?year=2026": { year: 2025, week: 2 } });
     renderPage(<LeagueScores leagueId="2" />);
     expect(await screen.findByRole("combobox", { name: "Week" })).toHaveValue("1");
   });
 
   it("keeps lineups visible when score requests fail and allows retry", async () => {
     mockApi(
-      { "https://api.fantasyfim.com/currentWeek": { year: 2025, week: 1 } },
+      { "https://api.fantasyfim.com/currentWeek?year=2026": { year: 2025, week: 1 } },
       { "https://api.fantasyfim.com/leagues/2/fantasyScores/1": 1 },
     );
     renderPage(<LeagueScores leagueId="2" />);
